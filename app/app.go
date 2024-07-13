@@ -169,12 +169,6 @@ const (
 )
 
 var (
-	// TODO review possible capabilities
-	// The last arguments can contain custom message handlers, and custom query handlers,
-	// if we want to allow any custom callbacks
-	// See https://github.com/CosmWasm/cosmwasm/blob/main/docs/CAPABILITIES-BUILT-IN.md
-	wasmCapabilities = []string{"iterator", "stargate", "cosmwasm_1_1", "cosmwasm_1_2", "staking", "babylon"}
-
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
 	// fee collector account, module accounts and their permissions
@@ -739,7 +733,7 @@ func NewBabylonApp(
 		app.GRPCQueryRouter(),
 		homePath,
 		wasmConfig,
-		wasmCapabilities,
+		WasmCapabilities(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		wasmOpts...,
 	)
@@ -747,7 +741,7 @@ func NewBabylonApp(
 	ibcWasmConfig :=
 		ibcwasmtypes.WasmConfig{
 			DataDir:               filepath.Join(homePath, "ibc_08-wasm"),
-			SupportedCapabilities: IBCWasmCapabilities(),
+			SupportedCapabilities: WasmCapabilities(),
 			ContractDebugMode:     false,
 		}
 
@@ -1330,14 +1324,18 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 }
 
 // Capabilities of the IBC wasm contracts
-func IBCWasmCapabilities() []string {
+func WasmCapabilities() []string {
+	// The last arguments can contain custom message handlers, and custom query handlers,
+	// if we want to allow any custom callbacks
 	return []string{
 		"iterator",
+		"staking",
 		"stargate",
 		"cosmwasm_1_1",
 		"cosmwasm_1_2",
 		"cosmwasm_1_3",
 		"cosmwasm_1_4",
 		"cosmwasm_2_0",
+		"babylon",
 	}
 }

@@ -204,32 +204,50 @@ func verify(tx *btcutil.Tx, merkleRoot *chainhash.Hash, intermediateNodes []byte
 	return bytes.Equal(current[:], root)
 }
 
-func ExtractOpReturnData(tx *btcutil.Tx) []byte {
+// ExtractStandardOpReturnData extract OP_RETURN data from transaction OP_RETURN
+// output.
+// If OP_RETRUN output is not standard it will be ignored. If there is more than
+// one output with OP_RETURN, error will be returned.
+func ExtractStandardOpReturnData(tx *btcutil.Tx) ([]byte, error) {
 	msgTx := tx.MsgTx()
 	opReturnData := []byte{}
 
-	for _, output := range msgTx.TxOut {
-		pkScript := output.PkScript
-		pkScriptLen := len(pkScript)
-		// valid op return script will have at least 2 bytes
-		// - fisrt byte should be OP_RETURN marker
-		// - second byte should indicate how many bytes there are in opreturn script
-		if pkScriptLen > 1 &&
-			pkScriptLen <= maxOpReturnPkScriptSize &&
-			pkScript[0] == txscript.OP_RETURN {
+	var opReturnCounter = 0
 
-			// if this is OP_PUSHDATA1, we need to drop first 3 bytes as those are related
+	for _, output := range msgTx.TxOut {
+		script := output.PkScript
+
+		if !txscript.IsNullData(script) {
+			// not an standard op_return, we do not care about this output
+			continue
+		}
+
+		// At this point we know:
+		// - script is not empty
+		// - script is valid looking op_return
+		// - with at most 80bytes of data
+		opReturnCounter++
+
+		if len(script) == 1 {
+			// just op_return op code
+			continue
+		}
+
+		if script[1] == txscript.OP_PUSHDATA1 {
+			// we need to drop first 3 bytes as those are related
 			// to script iteslf i.e OP_RETURN + OP_PUSHDATA1 + len of bytes
-			if pkScript[1] == txscript.OP_PUSHDATA1 {
-				opReturnData = append(opReturnData, pkScript[3:]...)
-			} else {
-				// this should be one of OP_DATAXX opcodes we drop first 2 bytes
-				opReturnData = append(opReturnData, pkScript[2:]...)
-			}
+			opReturnData = append(opReturnData, script[3:]...)
+		} else {
+			// this should be one of OP_DATAXX opcodes we drop first 2 bytes
+			opReturnData = append(opReturnData, script[2:]...)
 		}
 	}
 
-	return opReturnData
+	if opReturnCounter > 1 {
+		return nil, fmt.Errorf("transaction has more than one OP_RETURN output")
+	}
+
+	return opReturnData, nil
 }
 
 func ParseTransaction(bytes []byte) (*btcutil.Tx, error) {
@@ -276,7 +294,11 @@ func ParseProof(
 		return nil, fmt.Errorf("header failed validation due to failed proof")
 	}
 
-	opReturnData := ExtractOpReturnData(tx)
+	opReturnData, err := ExtractStandardOpReturnData(tx)
+
+	if err != nil {
+		return nil, err
+	}
 
 	if len(opReturnData) == 0 {
 		return nil, fmt.Errorf("provided transaction should provide op return data")

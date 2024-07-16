@@ -1,3 +1,6 @@
+// This code is only for testing purposes.
+// DO NOT USE IN PRODUCTION!
+
 package vanilla
 
 import (

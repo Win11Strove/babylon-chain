@@ -194,7 +194,7 @@ func verify(tx *btcutil.Tx, merkleRoot *chainhash.Hash, intermediateNodes []byte
 
 // ExtractStandardOpReturnData extract OP_RETURN data from transaction OP_RETURN
 // output.
-// If OP_RETRUN output is not standard it will be ignored. If there is more than
+// If OP_RETURN output is not standard it will be ignored. If there is more than
 // one output with OP_RETURN, error will be returned.
 func ExtractStandardOpReturnData(tx *btcutil.Tx) ([]byte, error) {
 	msgTx := tx.MsgTx()
@@ -206,15 +206,18 @@ func ExtractStandardOpReturnData(tx *btcutil.Tx) ([]byte, error) {
 		script := output.PkScript
 
 		if !txscript.IsNullData(script) {
-			// not an standard op_return, we do not care about this output
+			// not a standard op_return, we do not care about this output
 			continue
 		}
-
 		// At this point we know:
 		// - script is not empty
 		// - script is valid looking op_return
 		// - with at most 80bytes of data
 		opReturnCounter++
+
+		if opReturnCounter > 1 {
+			return nil, fmt.Errorf("transaction has more than one OP_RETURN output")
+		}
 
 		if len(script) == 1 {
 			// just op_return op code
@@ -229,10 +232,6 @@ func ExtractStandardOpReturnData(tx *btcutil.Tx) ([]byte, error) {
 			// this should be one of OP_DATAXX opcodes we drop first 2 bytes
 			opReturnData = append(opReturnData, script[2:]...)
 		}
-	}
-
-	if opReturnCounter > 1 {
-		return nil, fmt.Errorf("transaction has more than one OP_RETURN output")
 	}
 
 	return opReturnData, nil

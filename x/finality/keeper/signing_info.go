@@ -40,11 +40,11 @@ func (k Keeper) GetMissedBlockBitmapValue(ctx context.Context, fpPk *bbntypes.BI
 	return bs.Test(uint(bitIndex)), nil
 }
 
-// SetMissedBlockBitmapValue sets, i.e. flips, a bit in the validator's missed
+// SetMissedBlockBitmapValue sets, i.e. flips, a bit in the finality provider's missed
 // block bitmap. When missed=true, the bit is set, otherwise it set to zero. The
 // index provided is assumed to be the index in the range [0, SignedBlocksWindow),
 // which represents the bitmap where each bit represents a height, and is
-// determined by the validator's IndexOffset modulo SignedBlocksWindow. This
+// determined by the finality provider's IndexOffset modulo SignedBlocksWindow. This
 // index is used to fetch the chunk in the bitmap and the relative bit in that
 // chunk.
 func (k Keeper) SetMissedBlockBitmapValue(ctx context.Context, fpPk *bbntypes.BIP340PubKey, index int64, missed bool) error {
@@ -100,10 +100,8 @@ func (k Keeper) GetFinalityProviderMissedBlocks(ctx context.Context, fpPk *bbnty
 // IterateMissedBlockBitmap iterates over a finality provider's signed blocks window
 // bitmap and performs a callback function on each index, i.e. block height, in
 // the range [0, SignedBlocksWindow).
-//
 // Note: A callback will only be executed over all bitmap chunks that exist in
 // state.
-//
 // Adapted from
 // https://github.com/cosmos/cosmos-sdk/blob/f499bbf2138b171d6e5396a37df7699952e76bf3/x/slashing/keeper/signing_info.go#L202
 func (k Keeper) IterateMissedBlockBitmap(ctx context.Context, fpPk *bbntypes.BIP340PubKey, cb func(index int64, missed bool) (stop bool)) error {
@@ -128,14 +126,14 @@ func (k Keeper) IterateMissedBlockBitmap(ctx context.Context, fpPk *bbntypes.BIP
 	})
 }
 
-// DeleteMissedBlockBitmap removes a validator's missed block bitmap from state.
+// DeleteMissedBlockBitmap removes a finality provider's missed block bitmap from state.
 func (k Keeper) DeleteMissedBlockBitmap(ctx context.Context, fpPk *bbntypes.BIP340PubKey) error {
 	rng := collections.NewPrefixedPairRange[[]byte, uint64](fpPk.MustMarshal())
 	return k.FinalityProviderMissedBlockBitmap.Clear(ctx, rng)
 }
 
 // SetMissedBlockBitmapChunk sets the bitmap chunk at the given chunk index for
-// a validator's missed block signing window.
+// a finality provider's missed block signing window.
 func (k Keeper) SetMissedBlockBitmapChunk(ctx context.Context, fpPk *bbntypes.BIP340PubKey, chunkIndex int64, chunk []byte) error {
 	return k.FinalityProviderMissedBlockBitmap.Set(ctx, collections.Join(fpPk.MustMarshal(), uint64(chunkIndex)), chunk)
 }

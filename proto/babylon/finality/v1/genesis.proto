@@ -72,7 +72,7 @@ message SigningInfo {
 message FinalityProviderMissedBlocks {
   // fp_btc_pk is the BTC PK of the finality provider
   bytes fp_btc_pk = 1 [ (gogoproto.customtype) = "github.com/babylonchain/babylon/types.BIP340PubKey" ];
-  // missed_blocks is an array of missed blocks by the validator.
+  // missed_blocks is an array of missed blocks by the finality provider.
   repeated MissedBlock missed_blocks = 2 [(gogoproto.nullable) = false];
 }
 

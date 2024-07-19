@@ -338,7 +338,7 @@ func (m *SigningInfo) GetFpSigningInfo() FinalityProviderSigningInfo {
 type FinalityProviderMissedBlocks struct {
 	// fp_btc_pk is the BTC PK of the finality provider
 	FpBtcPk *github_com_babylonchain_babylon_types.BIP340PubKey `protobuf:"bytes,1,opt,name=fp_btc_pk,json=fpBtcPk,proto3,customtype=github.com/babylonchain/babylon/types.BIP340PubKey" json:"fp_btc_pk,omitempty"`
-	// missed_blocks is an array of missed blocks by the validator.
+	// missed_blocks is an array of missed blocks by the finality provider.
 	MissedBlocks []MissedBlock `protobuf:"bytes,2,rep,name=missed_blocks,json=missedBlocks,proto3" json:"missed_blocks"`
 }
 

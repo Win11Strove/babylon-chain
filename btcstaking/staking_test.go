@@ -2,7 +2,6 @@ package btcstaking_test
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"math/rand"
 	"testing"
@@ -36,7 +35,7 @@ func NewStakingScriptData(
 	stakingTime uint16) (*StakingScriptData, error) {
 
 	if stakerKey == nil || fpKey == nil || covenantKey == nil {
-		return nil, fmt.Errorf("staker, finality provider and covenant keys cannot be nil")
+		return nil, errors.New("staker, finality provider and covenant keys cannot be nil")
 	}
 
 	return &StakingScriptData{

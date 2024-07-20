@@ -3,6 +3,7 @@ package types
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"fmt"
 
 	"github.com/babylonchain/babylon/crypto/bip322"
@@ -150,14 +151,14 @@ func (pop *ProofOfPossessionBTC) Verify(staker sdk.AccAddress, bip340PK *bbn.BIP
 	case BTCSigType_ECDSA:
 		return pop.VerifyECDSA(staker, bip340PK)
 	default:
-		return fmt.Errorf("invalid BTC signature type")
+		return errors.New("invalid BTC signature type")
 	}
 }
 
 // VerifyBIP340 if the BTC signature has signed the hash by the pair of bip340PK.
 func VerifyBIP340(sigType BTCSigType, btcSigRaw []byte, bip340PK *bbn.BIP340PubKey, msg []byte) error {
 	if sigType != BTCSigType_BIP340 {
-		return fmt.Errorf("the Bitcoin signature in this proof of possession is not using BIP-340 encoding")
+		return errors.New("the Bitcoin signature in this proof of possession is not using BIP-340 encoding")
 	}
 
 	bip340Sig, err := bbn.NewBIP340Signature(btcSigRaw)
@@ -177,7 +178,7 @@ func VerifyBIP340(sigType BTCSigType, btcSigRaw []byte, bip340PK *bbn.BIP340PubK
 	// So we have to hash babylonSig before verifying the signature
 	hash := tmhash.Sum(msg)
 	if !btcSig.Verify(hash, btcPK) {
-		return fmt.Errorf("failed to verify pop.BtcSig")
+		return errors.New("failed to verify pop.BtcSig")
 	}
 
 	return nil
@@ -230,7 +231,7 @@ func isSupportedAddressAndWitness(
 			}
 
 			if !bytes.Equal(keyAddress.ScriptAddress(), address.ScriptAddress()) {
-				return fmt.Errorf("bip322Sig.Address does not correspond to bip340PK")
+				return errors.New("bip322Sig.Address does not correspond to bip340PK")
 			}
 
 			return nil
@@ -255,7 +256,7 @@ func isSupportedAddressAndWitness(
 			}
 
 			if !bytes.Equal(keyFromWitnessBytess, stakerKeyEncoded) {
-				return fmt.Errorf("bip322Sig.Address does not correspond to bip340PK")
+				return errors.New("bip322Sig.Address does not correspond to bip340PK")
 			}
 
 			return nil
@@ -263,7 +264,7 @@ func isSupportedAddressAndWitness(
 		}, nil
 	}
 
-	return nil, fmt.Errorf("unsupported bip322 address type. Only supported options are p2wpkh and p2tr bip86 key spending path")
+	return nil, errors.New("unsupported bip322 address type. Only supported options are p2wpkh and p2tr bip86 key spending path")
 }
 
 // VerifyBIP322SigPop verifies bip322 `signature` over `msg` and also checks whether
@@ -284,7 +285,7 @@ func VerifyBIP322SigPop(
 	net *chaincfg.Params,
 ) error {
 	if len(msg) == 0 || len(address) == 0 || len(signature) == 0 || len(pubKeyNoCoord) == 0 {
-		return fmt.Errorf("cannot verfiy bip322 signature. One of the required parameters is empty")
+		return errors.New("cannot verfiy bip322 signature. One of the required parameters is empty")
 	}
 
 	witness, err := bip322.SimpleSigToWitness(signature)
@@ -333,7 +334,7 @@ func VerifyBIP322SigPop(
 // verify whether bip322 pop signature where msg=signedMsg
 func VerifyBIP322(sigType BTCSigType, btcSigRaw []byte, bip340PK *bbn.BIP340PubKey, signedMsg []byte, net *chaincfg.Params) error {
 	if sigType != BTCSigType_BIP322 {
-		return fmt.Errorf("the Bitcoin signature in this proof of possession is not using BIP-322 encoding")
+		return errors.New("the Bitcoin signature in this proof of possession is not using BIP-322 encoding")
 	}
 	// unmarshal pop.BtcSig to bip322Sig
 	var bip322Sig BIP322Sig
@@ -376,7 +377,7 @@ func (pop *ProofOfPossessionBTC) VerifyBIP322(addr sdk.AccAddress, bip340PK *bbn
 // 1. verify(sig=sig_btc, pubkey=pk_btc, msg=msg)?
 func VerifyECDSA(sigType BTCSigType, btcSigRaw []byte, bip340PK *bbn.BIP340PubKey, msg []byte) error {
 	if sigType != BTCSigType_ECDSA {
-		return fmt.Errorf("the Bitcoin signature in this proof of possession is not using ECDSA encoding")
+		return errors.New("the Bitcoin signature in this proof of possession is not using ECDSA encoding")
 	}
 
 	// rule 1: verify(sig=sig_btc, pubkey=pk_btc, msg=msg)?
@@ -388,7 +389,7 @@ func VerifyECDSA(sigType BTCSigType, btcSigRaw []byte, bip340PK *bbn.BIP340PubKe
 	// So we have to hex BabylonSig before verifying the signature
 	bbnSigHex := hex.EncodeToString(msg)
 	if err := ecdsa.Verify(btcPK, bbnSigHex, btcSigRaw); err != nil {
-		return fmt.Errorf("failed to verify btcSigRaw")
+		return errors.New("failed to verify btcSigRaw")
 	}
 
 	return nil
@@ -403,7 +404,7 @@ func (pop *ProofOfPossessionBTC) VerifyECDSA(addr sdk.AccAddress, bip340PK *bbn.
 // ValidateBasic checks if there is a BTC Signature.
 func (pop *ProofOfPossessionBTC) ValidateBasic() error {
 	if pop.BtcSig == nil {
-		return fmt.Errorf("empty BTC signature")
+		return errors.New("empty BTC signature")
 	}
 
 	switch pop.BtcSigType {
@@ -421,10 +422,10 @@ func (pop *ProofOfPossessionBTC) ValidateBasic() error {
 		return nil
 	case BTCSigType_ECDSA:
 		if len(pop.BtcSig) != 65 { // size of compact signature
-			return fmt.Errorf("invalid BTC ECDSA signature size")
+			return errors.New("invalid BTC ECDSA signature size")
 		}
 		return nil
 	default:
-		return fmt.Errorf("invalid BTC signature type")
+		return errors.New("invalid BTC signature type")
 	}
 }

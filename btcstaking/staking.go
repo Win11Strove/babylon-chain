@@ -3,6 +3,7 @@ package btcstaking
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
@@ -41,7 +42,7 @@ func buildSlashingTxFromOutpoint(
 ) (*wire.MsgTx, error) {
 	// Validate staking amount
 	if stakingAmount <= 0 {
-		return nil, fmt.Errorf("staking amount must be larger than 0")
+		return nil, errors.New("staking amount must be larger than 0")
 	}
 
 	// Validate slashing rate
@@ -99,7 +100,7 @@ func getPossibleStakingOutput(
 	stakingOutputIdx uint32,
 ) (*wire.TxOut, error) {
 	if stakingTx == nil {
-		return nil, fmt.Errorf("provided staking transaction must not be nil")
+		return nil, errors.New("provided staking transaction must not be nil")
 	}
 
 	if stakingOutputIdx >= uint32(len(stakingTx.TxOut)) {
@@ -109,7 +110,7 @@ func getPossibleStakingOutput(
 	stakingOutput := stakingTx.TxOut[stakingOutputIdx]
 
 	if !txscript.IsPayToTaproot(stakingOutput.PkScript) {
-		return nil, fmt.Errorf("must be pay to taproot output")
+		return nil, errors.New("must be pay to taproot output")
 	}
 
 	return stakingOutput, nil
@@ -181,15 +182,15 @@ func BuildSlashingTxFromStakingTxStrict(
 // - has exactly one output
 func IsTransferTx(tx *wire.MsgTx) error {
 	if tx == nil {
-		return fmt.Errorf("transfer transaction must have cannot be nil")
+		return errors.New("transfer transaction must have cannot be nil")
 	}
 
 	if len(tx.TxIn) != 1 {
-		return fmt.Errorf("transfer transaction must have exactly one input")
+		return errors.New("transfer transaction must have exactly one input")
 	}
 
 	if len(tx.TxOut) != 1 {
-		return fmt.Errorf("transfer transaction must have exactly one output")
+		return errors.New("transfer transaction must have exactly one output")
 	}
 
 	return nil
@@ -206,11 +207,11 @@ func IsSimpleTransfer(tx *wire.MsgTx) error {
 	}
 
 	if tx.TxIn[0].Sequence != wire.MaxTxInSequenceNum {
-		return fmt.Errorf("simple transfer tx must not be replacable")
+		return errors.New("simple transfer tx must not be replacable")
 	}
 
 	if tx.LockTime != 0 {
-		return fmt.Errorf("simple transfer tx must not have locktime")
+		return errors.New("simple transfer tx must not have locktime")
 	}
 	return nil
 }
@@ -237,27 +238,27 @@ func validateSlashingTx(
 ) error {
 	// Verify that the slashing transaction is not nil.
 	if slashingTx == nil {
-		return fmt.Errorf("slashing transaction must not be nil")
+		return errors.New("slashing transaction must not be nil")
 	}
 
 	// Verify that the slashing transaction has exactly one input.
 	if len(slashingTx.TxIn) != 1 {
-		return fmt.Errorf("slashing transaction must have exactly one input")
+		return errors.New("slashing transaction must have exactly one input")
 	}
 
 	// Verify that the slashing transaction is non-replaceable.
 	if slashingTx.TxIn[0].Sequence != wire.MaxTxInSequenceNum {
-		return fmt.Errorf("slashing transaction must not be replaceable")
+		return errors.New("slashing transaction must not be replaceable")
 	}
 
 	// Verify that lock time of the slashing transaction is 0.
 	if slashingTx.LockTime != 0 {
-		return fmt.Errorf("slashing tx must not have locktime")
+		return errors.New("slashing tx must not have locktime")
 	}
 
 	// Verify that the slashing transaction has exactly two outputs.
 	if len(slashingTx.TxOut) != 2 {
-		return fmt.Errorf("slashing transaction must have exactly 2 outputs")
+		return errors.New("slashing transaction must have exactly 2 outputs")
 	}
 
 	// Verify that at least staking output value * slashing rate is slashed.
@@ -267,7 +268,7 @@ func validateSlashingTx(
 	}
 	minSlashingAmount := btcutil.Amount(stakingOutputValue).MulF64(slashingRateFloat64)
 	if btcutil.Amount(slashingTx.TxOut[0].Value) < minSlashingAmount {
-		return fmt.Errorf("slashing transaction must slash at least staking output value * slashing rate")
+		return errors.New("slashing transaction must slash at least staking output value * slashing rate")
 	}
 
 	// Verify that the first output pays to the provided slashing address.
@@ -276,7 +277,7 @@ func validateSlashingTx(
 		return fmt.Errorf("error creating slashing pk script: %w", err)
 	}
 	if !bytes.Equal(slashingTx.TxOut[0].PkScript, slashingPkScript) {
-		return fmt.Errorf("slashing transaction must pay to the provided slashing address")
+		return errors.New("slashing transaction must pay to the provided slashing address")
 	}
 
 	// Verify that the second output pays to the taproot address which locks funds for
@@ -307,7 +308,7 @@ func validateSlashingTx(
 	*/
 	// Check that values of slashing and staking transaction are larger than 0
 	if slashingTx.TxOut[0].Value <= 0 || stakingOutputValue <= 0 {
-		return fmt.Errorf("values of slashing and staking transaction must be larger than 0")
+		return errors.New("values of slashing and staking transaction must be larger than 0")
 	}
 
 	// Calculate the sum of output values in the slashing transaction.
@@ -318,7 +319,7 @@ func validateSlashingTx(
 
 	// Ensure that the staking transaction value is larger than the sum of slashing transaction output values.
 	if stakingOutputValue <= slashingTxOutSum {
-		return fmt.Errorf("slashing transaction must not spend more than staking transaction")
+		return errors.New("slashing transaction must not spend more than staking transaction")
 	}
 
 	// Ensure that the slashing transaction fee is larger than the specified minimum fee.
@@ -347,7 +348,7 @@ func CheckTransactions(
 	net *chaincfg.Params,
 ) error {
 	if slashingTx == nil || fundingTransaction == nil {
-		return fmt.Errorf("slashing and funding transactions must not be nil")
+		return errors.New("slashing and funding transactions must not be nil")
 	}
 
 	if err := blockchain.CheckTransactionSanity(btcutil.NewTx(slashingTx)); err != nil {
@@ -360,7 +361,7 @@ func CheckTransactions(
 
 	// Check if slashing tx min fee is valid
 	if slashingTxMinFee <= 0 {
-		return fmt.Errorf("slashing transaction min fee must be larger than 0")
+		return errors.New("slashing transaction min fee must be larger than 0")
 	}
 
 	// Check if slashing rate is in the valid range (0,1)
@@ -389,12 +390,12 @@ func CheckTransactions(
 	// 4. Check that slashing transaction input is pointing to staking transaction
 	stakingTxHash := fundingTransaction.TxHash()
 	if !slashingTx.TxIn[0].PreviousOutPoint.Hash.IsEqual(&stakingTxHash) {
-		return fmt.Errorf("slashing transaction must spend staking output")
+		return errors.New("slashing transaction must spend staking output")
 	}
 
 	// 5. Check that index of the fund output matches index of the input in slashing transaction
 	if slashingTx.TxIn[0].PreviousOutPoint.Index != fundingOutputIdx {
-		return fmt.Errorf("slashing transaction input must spend staking output")
+		return errors.New("slashing transaction input must spend staking output")
 	}
 	return nil
 }
@@ -441,19 +442,19 @@ func SignTxWithOneScriptSpendInputFromTapLeaf(
 	tapLeaf txscript.TapLeaf,
 ) (*schnorr.Signature, error) {
 	if txToSign == nil {
-		return nil, fmt.Errorf("tx to sign must not be nil")
+		return nil, errors.New("tx to sign must not be nil")
 	}
 
 	if fundingOutput == nil {
-		return nil, fmt.Errorf("funding output must not be nil")
+		return nil, errors.New("funding output must not be nil")
 	}
 
 	if privKey == nil {
-		return nil, fmt.Errorf("private key must not be nil")
+		return nil, errors.New("private key must not be nil")
 	}
 
 	if len(txToSign.TxIn) != 1 {
-		return nil, fmt.Errorf("tx to sign must have exactly one input")
+		return nil, errors.New("tx to sign must have exactly one input")
 	}
 
 	return signTxWithOneScriptSpendInputFromTapLeafInternal(
@@ -550,11 +551,11 @@ func EncSignTxWithOneScriptSpendInputStrict(
 
 func checkTxBeforeSigning(txToSign *wire.MsgTx, fundingTx *wire.MsgTx, fundingOutputIdx uint32) error {
 	if txToSign == nil {
-		return fmt.Errorf("tx to sign must not be nil")
+		return errors.New("tx to sign must not be nil")
 	}
 
 	if len(txToSign.TxIn) != 1 {
-		return fmt.Errorf("tx to sign must have exactly one input")
+		return errors.New("tx to sign must have exactly one input")
 	}
 
 	if fundingOutputIdx >= uint32(len(fundingTx.TxOut)) {
@@ -564,11 +565,11 @@ func checkTxBeforeSigning(txToSign *wire.MsgTx, fundingTx *wire.MsgTx, fundingOu
 	fundingTxHash := fundingTx.TxHash()
 
 	if !txToSign.TxIn[0].PreviousOutPoint.Hash.IsEqual(&fundingTxHash) {
-		return fmt.Errorf("txToSign must input point to fundingTx")
+		return errors.New("txToSign must input point to fundingTx")
 	}
 
 	if txToSign.TxIn[0].PreviousOutPoint.Index != fundingOutputIdx {
-		return fmt.Errorf("txToSign inpunt index must point to output with provided script")
+		return errors.New("txToSign inpunt index must point to output with provided script")
 	}
 
 	return nil
@@ -586,19 +587,19 @@ func VerifyTransactionSigWithOutput(
 	signature []byte) error {
 
 	if fundingOutput == nil {
-		return fmt.Errorf("funding output must not be nil")
+		return errors.New("funding output must not be nil")
 	}
 
 	if transaction == nil {
-		return fmt.Errorf("tx to verify not be nil")
+		return errors.New("tx to verify not be nil")
 	}
 
 	if len(transaction.TxIn) != 1 {
-		return fmt.Errorf("tx to sign must have exactly one input")
+		return errors.New("tx to sign must have exactly one input")
 	}
 
 	if pubKey == nil {
-		return fmt.Errorf("public key must not be nil")
+		return errors.New("public key must not be nil")
 	}
 
 	tapLeaf := txscript.NewBaseTapLeaf(script)
@@ -627,7 +628,7 @@ func VerifyTransactionSigWithOutput(
 	valid := parsedSig.Verify(sigHash, pubKey)
 
 	if !valid {
-		return fmt.Errorf("signature is not valid")
+		return errors.New("signature is not valid")
 	}
 
 	return nil
@@ -646,15 +647,15 @@ func EncVerifyTransactionSigWithOutput(
 	signature *asig.AdaptorSignature,
 ) error {
 	if transaction == nil {
-		return fmt.Errorf("tx to verify not be nil")
+		return errors.New("tx to verify not be nil")
 	}
 
 	if len(transaction.TxIn) != 1 {
-		return fmt.Errorf("tx to sign must have exactly one input")
+		return errors.New("tx to sign must have exactly one input")
 	}
 
 	if pubKey == nil {
-		return fmt.Errorf("public key must not be nil")
+		return errors.New("public key must not be nil")
 	}
 
 	tapLeaf := txscript.NewBaseTapLeaf(script)

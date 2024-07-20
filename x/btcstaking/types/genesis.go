@@ -2,7 +2,7 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 )
@@ -19,7 +19,7 @@ func DefaultGenesis() *GenesisState {
 // failure.
 func (gs GenesisState) Validate() error {
 	if len(gs.Params) == 0 {
-		return fmt.Errorf("params cannot be empty")
+		return errors.New("params cannot be empty")
 	}
 
 	// TODO: add validation to other properties of genstate.

@@ -1,7 +1,7 @@
 package types_test
 
 import (
-	"fmt"
+	"errors"
 	"math/rand"
 	"testing"
 
@@ -191,7 +191,7 @@ func TestPoPBTCValidateBasic(t *testing.T) {
 		{
 			"invalid: nil sig",
 			&types.ProofOfPossessionBTC{},
-			fmt.Errorf("empty BTC signature"),
+			errors.New("empty BTC signature"),
 		},
 		{
 			"invalid: BIP 340 - bad sig",
@@ -199,7 +199,7 @@ func TestPoPBTCValidateBasic(t *testing.T) {
 				BtcSigType: types.BTCSigType_BIP340,
 				BtcSig:     popBip322.BtcSig,
 			},
-			fmt.Errorf("invalid BTC BIP340 signature: bytes cannot be converted to a *schnorr.Signature object"),
+			errors.New("invalid BTC BIP340 signature: bytes cannot be converted to a *schnorr.Signature object"),
 		},
 		{
 			"invalid: BIP 322 - bad sig",
@@ -207,7 +207,7 @@ func TestPoPBTCValidateBasic(t *testing.T) {
 				BtcSigType: types.BTCSigType_BIP322,
 				BtcSig:     []byte("ss"),
 			},
-			fmt.Errorf("invalid BTC BIP322 signature: unexpected EOF"),
+			errors.New("invalid BTC BIP322 signature: unexpected EOF"),
 		},
 		{
 			"invalid: ECDSA - bad sig",
@@ -215,7 +215,7 @@ func TestPoPBTCValidateBasic(t *testing.T) {
 				BtcSigType: types.BTCSigType_ECDSA,
 				BtcSig:     popBip340.BtcSig,
 			},
-			fmt.Errorf("invalid BTC ECDSA signature size"),
+			errors.New("invalid BTC ECDSA signature size"),
 		},
 	}
 
@@ -287,21 +287,21 @@ func TestPoPBTCVerify(t *testing.T) {
 			randomAddr,
 			bip340PK,
 			popBip340,
-			fmt.Errorf("failed to verify pop.BtcSig"),
+			errors.New("failed to verify pop.BtcSig"),
 		},
 		{
 			"invalid: BIP322 - bad addr",
 			randomAddr,
 			bip340PK,
 			popBip322,
-			fmt.Errorf("failed to verify possession of babylon sig by the BTC key: signature not empty on failed checksig"),
+			errors.New("failed to verify possession of babylon sig by the BTC key: signature not empty on failed checksig"),
 		},
 		{
 			"invalid: ECDSA - bad addr",
 			randomAddr,
 			bip340PK,
 			popECDSA,
-			fmt.Errorf("failed to verify btcSigRaw"),
+			errors.New("failed to verify btcSigRaw"),
 		},
 		{
 			"invalid: SigType",
@@ -310,7 +310,7 @@ func TestPoPBTCVerify(t *testing.T) {
 			&types.ProofOfPossessionBTC{
 				BtcSigType: types.BTCSigType(123),
 			},
-			fmt.Errorf("invalid BTC signature type"),
+			errors.New("invalid BTC signature type"),
 		},
 		{
 			"invalid: nil sig",
@@ -320,14 +320,14 @@ func TestPoPBTCVerify(t *testing.T) {
 				BtcSigType: types.BTCSigType_BIP322,
 				BtcSig:     nil,
 			},
-			fmt.Errorf("failed to verify possession of babylon sig by the BTC key: cannot verfiy bip322 signature. One of the required parameters is empty"),
+			errors.New("failed to verify possession of babylon sig by the BTC key: cannot verfiy bip322 signature. One of the required parameters is empty"),
 		},
 		{
 			"invalid: nil signed msg",
 			nil,
 			bip340PK,
 			popBip340,
-			fmt.Errorf("failed to verify pop.BtcSig"),
+			errors.New("failed to verify pop.BtcSig"),
 		},
 	}
 

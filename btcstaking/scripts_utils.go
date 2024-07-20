@@ -2,7 +2,7 @@ package btcstaking
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"sort"
 
 	"github.com/btcsuite/btcd/btcec/v2"
@@ -60,7 +60,7 @@ func SortKeys(keys []*btcec.PublicKey) []*btcec.PublicKey {
 // Note: It is up to the caller to ensure that the keys are unique
 func prepareKeysForMultisigScript(keys []*btcec.PublicKey) ([]*btcec.PublicKey, error) {
 	if len(keys) < 2 {
-		return nil, fmt.Errorf("cannot create multisig script with less than 2 keys")
+		return nil, errors.New("cannot create multisig script with less than 2 keys")
 	}
 
 	sortedKeys := SortKeys(keys)
@@ -79,11 +79,11 @@ func buildMultiSigScript(
 	withVerify bool,
 ) ([]byte, error) {
 	if len(keys) == 0 {
-		return nil, fmt.Errorf("no keys provided")
+		return nil, errors.New("no keys provided")
 	}
 
 	if threshold > uint32(len(keys)) {
-		return nil, fmt.Errorf("required number of valid signers is greater than number of provided keys")
+		return nil, errors.New("required number of valid signers is greater than number of provided keys")
 	}
 
 	if len(keys) == 1 {

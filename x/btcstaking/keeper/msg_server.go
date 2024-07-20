@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -261,7 +262,7 @@ func (ms msgServer) CreateBTCDelegation(goCtx context.Context, req *types.MsgCre
 	// get startheight and endheight of the timelock
 	stakingTxHeader := ms.btclcKeeper.GetHeaderByHash(ctx, req.StakingTx.Key.Hash)
 	if stakingTxHeader == nil {
-		return nil, fmt.Errorf("header that includes the staking tx is not found")
+		return nil, errors.New("header that includes the staking tx is not found")
 	}
 	startHeight := stakingTxHeader.Height
 	endHeight := stakingTxHeader.Height + uint64(req.StakingTime)

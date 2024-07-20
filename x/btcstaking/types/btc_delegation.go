@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	math "math"
 
@@ -29,7 +30,7 @@ func NewBTCDelegationStatusFromString(statusStr string) (BTCDelegationStatus, er
 	case "any":
 		return BTCDelegationStatus_ANY, nil
 	default:
-		return -1, fmt.Errorf("invalid status string; should be one of {pending, active, unbonding, unbonded, any}")
+		return -1, errors.New("invalid status string; should be one of {pending, active, unbonding, unbonded, any}")
 	}
 }
 
@@ -145,25 +146,25 @@ func (d *BTCDelegation) ValidateBasic() error {
 		return fmt.Errorf("invalid staker address: %s - %w", d.StakerAddr, err)
 	}
 	if d.BtcPk == nil {
-		return fmt.Errorf("empty BTC public key")
+		return errors.New("empty BTC public key")
 	}
 	if d.Pop == nil {
-		return fmt.Errorf("empty proof of possession")
+		return errors.New("empty proof of possession")
 	}
 	if len(d.FpBtcPkList) == 0 {
-		return fmt.Errorf("empty list of finality provider PKs")
+		return errors.New("empty list of finality provider PKs")
 	}
 	if ExistsDup(d.FpBtcPkList) {
-		return fmt.Errorf("list of finality provider PKs has duplication")
+		return errors.New("list of finality provider PKs has duplication")
 	}
 	if d.StakingTx == nil {
-		return fmt.Errorf("empty staking tx")
+		return errors.New("empty staking tx")
 	}
 	if d.SlashingTx == nil {
-		return fmt.Errorf("empty slashing tx")
+		return errors.New("empty slashing tx")
 	}
 	if d.DelegatorSig == nil {
-		return fmt.Errorf("empty delegator signature")
+		return errors.New("empty delegator signature")
 	}
 
 	// ensure staking tx is correctly formatted
@@ -317,7 +318,7 @@ func (d *BTCDelegation) findFPIdx(fpBTCPK *bbn.BIP340PubKey) (int, error) {
 			return i, nil
 		}
 	}
-	return 0, fmt.Errorf("the given finality provider's PK is not found in the BTC delegation")
+	return 0, errors.New("the given finality provider's PK is not found in the BTC delegation")
 }
 
 // BuildSlashingTxWithWitness uses the given finality provider's SK to complete
@@ -363,7 +364,7 @@ func (d *BTCDelegation) BuildSlashingTxWithWitness(bsParams *Params, btcNet *cha
 		slashingSpendInfo,
 	)
 	if err != nil {
-		return nil, fmt.Errorf(
+		return nil, errors.New(
 			"failed to build witness for BTC delegation of %s under finality provider %s: %v",
 			d.BtcPk.MarshalHex(),
 			bbn.NewBIP340PubKeyFromBTCPK(fpSK.PubKey()).MarshalHex(),
@@ -414,7 +415,7 @@ func (d *BTCDelegation) BuildUnbondingSlashingTxWithWitness(bsParams *Params, bt
 		slashingSpendInfo,
 	)
 	if err != nil {
-		return nil, fmt.Errorf(
+		return nil, errors.New(
 			"failed to build witness for unbonding BTC delegation %s under finality provider %s: %v",
 			d.BtcPk.MarshalHex(),
 			bbn.NewBIP340PubKeyFromBTCPK(fpSK.PubKey()).MarshalHex(),

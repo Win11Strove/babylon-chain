@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -54,7 +54,7 @@ func (k Keeper) SlashFinalityProvider(ctx context.Context, fpBTCPK []byte) error
 	fp.SlashedBabylonHeight = uint64(sdk.UnwrapSDKContext(ctx).HeaderInfo().Height)
 	btcTip := k.btclcKeeper.GetTipInfo(ctx)
 	if btcTip == nil {
-		return fmt.Errorf("failed to get current BTC tip")
+		return errors.New("failed to get current BTC tip")
 	}
 	fp.SlashedBtcHeight = btcTip.Height
 	k.SetFinalityProvider(ctx, fp)

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"fmt"
 	"math"
 
@@ -76,18 +77,18 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 
 func validateMinSlashingTxFeeSat(fee int64) error {
 	if fee <= 0 {
-		return fmt.Errorf("minimum slashing tx fee has to be positive")
+		return errors.New("minimum slashing tx fee has to be positive")
 	}
 	return nil
 }
 
 func validateMinCommissionRate(rate sdkmath.LegacyDec) error {
 	if rate.IsNil() {
-		return fmt.Errorf("minimum commission rate cannot be nil")
+		return errors.New("minimum commission rate cannot be nil")
 	}
 
 	if rate.IsNegative() {
-		return fmt.Errorf("minimum commission rate cannot be negative")
+		return errors.New("minimum commission rate cannot be negative")
 	}
 
 	if rate.GT(sdkmath.LegacyOneDec()) {
@@ -100,7 +101,7 @@ func validateMinCommissionRate(rate sdkmath.LegacyDec) error {
 // active finality providers is at least the default value
 func validateMaxActiveFinalityProviders(maxActiveFinalityProviders uint32) error {
 	if maxActiveFinalityProviders == 0 {
-		return fmt.Errorf("max finality providers must be positive")
+		return errors.New("max finality providers must be positive")
 	}
 	return nil
 }
@@ -108,7 +109,7 @@ func validateMaxActiveFinalityProviders(maxActiveFinalityProviders uint32) error
 // validateCovenantPks checks whether the covenants list contains any duplicates
 func validateCovenantPks(covenantPks []bbn.BIP340PubKey) error {
 	if ExistsDup(covenantPks) {
-		return fmt.Errorf("duplicate covenant key")
+		return errors.New("duplicate covenant key")
 	}
 	return nil
 }
@@ -124,10 +125,10 @@ func validateMinUnbondingTime(minUnbondingTimeBlocks uint32) error {
 // Validate validates the set of params
 func (p Params) Validate() error {
 	if p.CovenantQuorum == 0 {
-		return fmt.Errorf("covenant quorum size has to be positive")
+		return errors.New("covenant quorum size has to be positive")
 	}
 	if p.CovenantQuorum*2 <= uint32(len(p.CovenantPks)) {
-		return fmt.Errorf("covenant quorum size has to be more than 1/2 of the covenant committee size")
+		return errors.New("covenant quorum size has to be more than 1/2 of the covenant committee size")
 	}
 	if err := validateCovenantPks(p.CovenantPks); err != nil {
 		return err
@@ -145,7 +146,7 @@ func (p Params) Validate() error {
 	}
 
 	if !btcstaking.IsRateValid(p.MinUnbondingRate) {
-		return fmt.Errorf("minimum unbonding value is invalid. it should be fraction in range (0, 1) with at 2 decimal places precision")
+		return errors.New("minimum unbonding value is invalid. it should be fraction in range (0, 1) with at 2 decimal places precision")
 	}
 
 	if err := validateMaxActiveFinalityProviders(p.MaxActiveFinalityProviders); err != nil {

@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"testing"
@@ -50,7 +51,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 				BtcPk:       fp.BtcPk,
 				Pop:         fp.Pop,
 			},
-			fmt.Errorf("empty commission"),
+			errors.New("empty commission"),
 		},
 		{
 			"invalid: empty description",
@@ -61,7 +62,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 				BtcPk:       fp.BtcPk,
 				Pop:         fp.Pop,
 			},
-			fmt.Errorf("empty description"),
+			errors.New("empty description"),
 		},
 		{
 			"invalid: empty moniker",
@@ -78,7 +79,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 				BtcPk:      fp.BtcPk,
 				Pop:        fp.Pop,
 			},
-			fmt.Errorf("empty moniker"),
+			errors.New("empty moniker"),
 		},
 		{
 			"invalid: big moniker",
@@ -106,7 +107,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 				BtcPk:       nil,
 				Pop:         fp.Pop,
 			},
-			fmt.Errorf("empty BTC public key"),
+			errors.New("empty BTC public key"),
 		},
 		{
 			"invalid: invalid BTC pk",
@@ -128,7 +129,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 				BtcPk:       fp.BtcPk,
 				Pop:         nil,
 			},
-			fmt.Errorf("empty proof of possession"),
+			errors.New("empty proof of possession"),
 		},
 		{
 			"invalid: empty PoP",
@@ -139,7 +140,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 				BtcPk:       fp.BtcPk,
 				Pop:         nil,
 			},
-			fmt.Errorf("empty proof of possession"),
+			errors.New("empty proof of possession"),
 		},
 		{
 			"invalid: bad addr",
@@ -150,7 +151,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 				BtcPk:       fp.BtcPk,
 				Pop:         fp.Pop,
 			},
-			fmt.Errorf("invalid FP addr: %s - %v", invalidAddr, fmt.Errorf("decoding bech32 failed: invalid separator index -1")),
+			fmt.Errorf("invalid FP addr: %s - %v", invalidAddr, errors.New("decoding bech32 failed: invalid separator index -1")),
 		},
 		{
 			"invalid: bad PoP empty sig",
@@ -163,7 +164,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 					BtcSig: nil,
 				},
 			},
-			fmt.Errorf("empty BTC signature"),
+			errors.New("empty BTC signature"),
 		},
 	}
 

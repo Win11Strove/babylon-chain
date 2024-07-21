@@ -364,7 +364,7 @@ func (d *BTCDelegation) BuildSlashingTxWithWitness(bsParams *Params, btcNet *cha
 		slashingSpendInfo,
 	)
 	if err != nil {
-		return nil, errors.New(
+		return nil, fmt.Errorf(
 			"failed to build witness for BTC delegation of %s under finality provider %s: %v",
 			d.BtcPk.MarshalHex(),
 			bbn.NewBIP340PubKeyFromBTCPK(fpSK.PubKey()).MarshalHex(),
@@ -415,7 +415,7 @@ func (d *BTCDelegation) BuildUnbondingSlashingTxWithWitness(bsParams *Params, bt
 		slashingSpendInfo,
 	)
 	if err != nil {
-		return nil, errors.New(
+		return nil, fmt.Errorf(
 			"failed to build witness for unbonding BTC delegation %s under finality provider %s: %v",
 			d.BtcPk.MarshalHex(),
 			bbn.NewBIP340PubKeyFromBTCPK(fpSK.PubKey()).MarshalHex(),

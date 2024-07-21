@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"cosmossdk.io/errors"
+	errorsmod "cosmossdk.io/errors"
 	"github.com/babylonchain/babylon/testutil/datagen"
 	bbntypes "github.com/babylonchain/babylon/types"
 	"github.com/babylonchain/babylon/x/btcstaking/types"
@@ -96,7 +96,7 @@ func TestMsgCreateFinalityProviderValidateBasic(t *testing.T) {
 				BtcPk:      fp.BtcPk,
 				Pop:        fp.Pop,
 			},
-			errors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid moniker length; got: %d, max: %d", len(randBigMoniker), stktypes.MaxMonikerLength),
+			errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "invalid moniker length; got: %d, max: %d", len(randBigMoniker), stktypes.MaxMonikerLength),
 		},
 		{
 			"invalid: empty BTC pk",

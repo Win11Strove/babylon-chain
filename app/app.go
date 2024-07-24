@@ -159,6 +159,7 @@ var (
 	}
 
 	// software upgrades and forks
+	// TODO: REMOVE UPGRADE BEFORE MAINNET, used for e2e testing
 	Upgrades = []upgrades.Upgrade{
 		vanilla.Upgrade,
 	}

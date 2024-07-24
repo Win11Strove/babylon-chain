@@ -5,7 +5,7 @@
     {
       "@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade",
       "authority": "bbn10d07y265gmmuvt4z0w9aw880jnsr700jduz5f2",
-      "plan": { "name": "vanilla", "info": "Msg info", "height": 20 }
+      "plan": { "name": "vanilla", "info": "Msg info", "height": 25 }
     }
   ],
   "deposit": "500000000ubbn",

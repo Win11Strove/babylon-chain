@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/babylonchain/babylon/test/e2e/configurer/chain"
+	"github.com/babylonchain/babylon/test/e2e/configurer/config"
 	"github.com/babylonchain/babylon/test/e2e/containers"
 	"github.com/babylonchain/babylon/test/e2e/initialization"
 	zctypes "github.com/babylonchain/babylon/x/zoneconcierge/types"
@@ -114,7 +115,7 @@ var (
 // TODO currently only one configuration is available. Consider testing upgrades
 // when necessary
 func NewBTCTimestampingConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
-	containerManager, err := containers.NewManager(isDebugLogEnabled, false)
+	containerManager, err := containers.NewManager(isDebugLogEnabled, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +131,7 @@ func NewBTCTimestampingConfigurer(t *testing.T, isDebugLogEnabled bool) (Configu
 }
 
 func NewIBCTransferConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
-	containerManager, err := containers.NewManager(isDebugLogEnabled, false)
+	containerManager, err := containers.NewManager(isDebugLogEnabled, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +148,7 @@ func NewIBCTransferConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer,
 
 // NewBTCTimestampingPhase2Configurer returns a new Configurer for BTC timestamping service (phase 2).
 func NewBTCTimestampingPhase2Configurer(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
-	containerManager, err := containers.NewManager(isDebugLogEnabled, false)
+	containerManager, err := containers.NewManager(isDebugLogEnabled, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +165,7 @@ func NewBTCTimestampingPhase2Configurer(t *testing.T, isDebugLogEnabled bool) (C
 
 // NewBTCTimestampingPhase2RlyConfigurer returns a new Configurer for BTC timestamping service (phase 2), using the Go relayer (rly).
 func NewBTCTimestampingPhase2RlyConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
-	containerManager, err := containers.NewManager(isDebugLogEnabled, true)
+	containerManager, err := containers.NewManager(isDebugLogEnabled, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +182,7 @@ func NewBTCTimestampingPhase2RlyConfigurer(t *testing.T, isDebugLogEnabled bool)
 
 // NewBTCStakingConfigurer returns a new Configurer for BTC staking service
 func NewBTCStakingConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
-	containerManager, err := containers.NewManager(isDebugLogEnabled, false)
+	containerManager, err := containers.NewManager(isDebugLogEnabled, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -196,9 +197,9 @@ func NewBTCStakingConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, 
 	), nil
 }
 
-// NewSoftwareUpgradeTest returns a new Configurer for Software Upgrade testing
-func NewSoftwareUpgradeTest(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
-	containerManager, err := containers.NewManager(isDebugLogEnabled, false)
+// NewSoftwareUpgradeCurrentBranchTest returns a new Configurer for Software Upgrade testing
+func NewSoftwareUpgradeCurrentBranchTest(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
+	containerManager, err := containers.NewManager(isDebugLogEnabled, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -210,5 +211,24 @@ func NewSoftwareUpgradeTest(t *testing.T, isDebugLogEnabled bool) (Configurer, e
 		},
 		baseSetup, // base set up
 		containerManager,
+	), nil
+}
+
+// NewSoftwareUpgradeTest returns a new Configurer for Software Upgrade testing
+func NewSoftwareUpgradeTest(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
+	containerManager, err := containers.NewManager(isDebugLogEnabled, false, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewUpgradeConfigurer(t,
+		[]*chain.Config{
+			// we only need 1 chain for testing upgrade
+			chain.New(t, containerManager, initialization.ChainAID, validatorConfigsChainA, nil),
+		},
+		withUpgrade(baseSetup), // base set up with upgrade
+		containerManager,
+		config.VanillaUpgradeFilePath,
+		0,
 	), nil
 }

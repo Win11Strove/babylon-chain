@@ -95,6 +95,10 @@ func (n *NodeConfig) BankSendFromNode(receiveAddress, amount string) {
 	n.BankSend(n.WalletName, receiveAddress, amount)
 }
 
+func (n *NodeConfig) BankMultiSendFromNode(addresses []string, amount string) {
+	n.BankMultiSend(n.WalletName, addresses, amount)
+}
+
 func (n *NodeConfig) BankSend(fromWallet, to, amount string, overallFlags ...string) {
 	fromAddr := n.GetWallet(fromWallet)
 	n.LogActionF("bank sending %s from wallet %s to %s", amount, fromWallet, to)
@@ -102,6 +106,16 @@ func (n *NodeConfig) BankSend(fromWallet, to, amount string, overallFlags ...str
 	_, _, err := n.containerManager.ExecTxCmd(n.t, n.chainId, n.Name, append(cmd, overallFlags...))
 	require.NoError(n.t, err)
 	n.LogActionF("successfully sent bank sent %s from address %s to %s", amount, fromWallet, to)
+}
+
+func (n *NodeConfig) BankMultiSend(fromWallet string, to []string, amount string, overallFlags ...string) {
+	fromAddr := n.GetWallet(fromWallet)
+	toFormated := strings.Join(to, " ")
+	n.LogActionF("bank multi-send sending %s from wallet %s to %s", amount, fromWallet, toFormated)
+	cmd := []string{"babylond", "tx", "bank", "multi-send", fromAddr, toFormated, amount, fmt.Sprintf("--from=%s", fromWallet)}
+	_, _, err := n.containerManager.ExecTxCmd(n.t, n.chainId, n.Name, append(cmd, overallFlags...))
+	require.NoError(n.t, err)
+	n.LogActionF("successfully sent bank multi-send %s from address %s to %s", amount, fromWallet, toFormated)
 }
 
 func (n *NodeConfig) BankSendOutput(fromWallet, to, amount string, overallFlags ...string) (out bytes.Buffer, errBuff bytes.Buffer, err error) {

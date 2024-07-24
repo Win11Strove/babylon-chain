@@ -419,6 +419,7 @@ proto-lint:
 ###############################################################################
 ###                                Docker                                   ###
 ###############################################################################
+dockerNetworkList=$($(DOCKER) network ls --filter name=bbn-testnet --format {{.ID}})
 
 build-docker:
 	$(MAKE) -C contrib/images babylond
@@ -430,7 +431,10 @@ build-docker-e2e: build-docker
 build-cosmos-relayer-docker:
 	$(MAKE) -C contrib/images cosmos-relayer
 
-.PHONY: build-docker build-docker-e2e build-cosmos-relayer-docker
+clean-docker-network:
+	$(DOCKER) network rm ${dockerNetworkList}
+
+.PHONY: build-docker build-docker-e2e build-cosmos-relayer-docker clean-docker-network
 
 ###############################################################################
 ###                                Localnet                                 ###

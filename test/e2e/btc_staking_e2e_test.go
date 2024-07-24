@@ -302,7 +302,7 @@ func (s *BTCStakingTestSuite) Test3CommitPublicRandomnessAndSubmitFinalitySignat
 	s.NoError(err)
 
 	_, err = nonValidatorNode.QueryRewardGauge(fpBabylonAddr)
-	s.ErrorIs(err, itypes.ErrRewardGaugeNotFound)
+	s.ErrorContains(err, itypes.ErrRewardGaugeNotFound.Error())
 	delBabylonAddr := fpBabylonAddr
 
 	/*

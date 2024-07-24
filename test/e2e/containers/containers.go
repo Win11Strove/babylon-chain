@@ -332,11 +332,11 @@ func (m *Manager) ClearResources() (e error) {
 		})
 	}
 
-	g.Go(func() error {
-		return m.pool.RemoveNetwork(m.network)
-	})
+	if err := g.Wait(); err != nil {
+		return err
+	}
 
-	return g.Wait()
+	return m.pool.RemoveNetwork(m.network)
 }
 
 func noRestart(config *docker.HostConfig) {

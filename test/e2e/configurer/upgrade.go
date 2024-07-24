@@ -134,13 +134,12 @@ func (uc *UpgradeConfigurer) CreatePreUpgradeState() error {
 	amountToSend := sdk.NewCoin(appparams.BaseCoinUnit, sdkmath.NewInt(1000000)) // 1bbn
 	for _, chain := range uc.chainConfigs {
 		firstNode := chain.NodeConfigs[0]
-		otherNodes := chain.NodeConfigs[:1]
-		// first node to others...
+		otherNodes := chain.NodeConfigs[1:]
+		// first node send to others...
 
 		addresses := make([]string, len(otherNodes))
-		for i := 1; i < len(otherNodes); i++ {
-			nodeI := chain.NodeConfigs[i]
-			addresses[i] = nodeI.PublicAddress
+		for i, node := range otherNodes {
+			addresses[i] = node.PublicAddress
 		}
 		firstNode.BankMultiSendFromNode(addresses, amountToSend.String())
 	}

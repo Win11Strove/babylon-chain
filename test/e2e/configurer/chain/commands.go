@@ -108,14 +108,21 @@ func (n *NodeConfig) BankSend(fromWallet, to, amount string, overallFlags ...str
 	n.LogActionF("successfully sent bank sent %s from address %s to %s", amount, fromWallet, to)
 }
 
-func (n *NodeConfig) BankMultiSend(fromWallet string, to []string, amount string, overallFlags ...string) {
+func (n *NodeConfig) BankMultiSend(fromWallet string, receivers []string, amount string, overallFlags ...string) {
+	if len(receivers) == 0 {
+		require.Error(n.t, fmt.Errorf("no address to send to"))
+	}
+
 	fromAddr := n.GetWallet(fromWallet)
-	toFormated := strings.Join(to, " ")
-	n.LogActionF("bank multi-send sending %s from wallet %s to %s", amount, fromWallet, toFormated)
-	cmd := []string{"babylond", "tx", "bank", "multi-send", fromAddr, toFormated, amount, fmt.Sprintf("--from=%s", fromWallet)}
+	n.LogActionF("bank multi-send sending %s from wallet %s to %+v", amount, fromWallet, receivers)
+
+	cmd := []string{"babylond", "tx", "bank", "multi-send", fromAddr} // starts the initial flags
+	cmd = append(cmd, receivers...)                                   // appends all the receivers
+	cmd = append(cmd, amount, fmt.Sprintf("--from=%s", fromWallet))   // set amounts and overall
+
 	_, _, err := n.containerManager.ExecTxCmd(n.t, n.chainId, n.Name, append(cmd, overallFlags...))
 	require.NoError(n.t, err)
-	n.LogActionF("successfully sent bank multi-send %s from address %s to %s", amount, fromWallet, toFormated)
+	n.LogActionF("successfully sent bank multi-send %s from address %s to %+v", amount, fromWallet, receivers)
 }
 
 func (n *NodeConfig) BankSendOutput(fromWallet, to, amount string, overallFlags ...string) (out bytes.Buffer, errBuff bytes.Buffer, err error) {

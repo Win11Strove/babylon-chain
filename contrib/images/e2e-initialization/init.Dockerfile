@@ -38,9 +38,6 @@ ARG E2E_SCRIPT_NAME
 
 COPY --from=build-env /go/src/github.com/babylonchain/babylon/build/${E2E_SCRIPT_NAME} /bin/${E2E_SCRIPT_NAME}
 
-ENV HOME /babylond
-WORKDIR $HOME
-
 # Docker ARGs are not expanded in ENTRYPOINT in the exec mode. At the same time,
 # it is impossible to add CMD arguments when running a container in the shell mode.
 # As a workaround, we create the entrypoint.sh script to bypass these issues.

@@ -197,23 +197,6 @@ func NewBTCStakingConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, 
 	), nil
 }
 
-// NewSoftwareUpgradeCurrentBranchTest returns a new Configurer for Software Upgrade testing
-func NewSoftwareUpgradeCurrentBranchTest(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
-	containerManager, err := containers.NewManager(isDebugLogEnabled, false, false)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewCurrentBranchConfigurer(t,
-		[]*chain.Config{
-			// we only need 1 chain for testing upgrade
-			chain.New(t, containerManager, initialization.ChainAID, validatorConfigsChainA, nil),
-		},
-		baseSetup, // base set up
-		containerManager,
-	), nil
-}
-
 // NewSoftwareUpgradeTest returns a new Configurer for Software Upgrade testing
 func NewSoftwareUpgradeTest(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
 	containerManager, err := containers.NewManager(isDebugLogEnabled, false, true)

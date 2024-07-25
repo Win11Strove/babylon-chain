@@ -154,13 +154,6 @@ func (n *NodeConfig) WaitForNextBlocks(numberOfBlocks uint64) {
 	}, fmt.Sprintf("Timed out waiting for block %d. Current height is: %d", latest, blockToWait))
 }
 
-func (n *NodeConfig) WaitForBlockHeight(blkHeight uint64) {
-	n.WaitForCondition(func() bool {
-		newLatest := n.LatestBlockNumber()
-		return newLatest > blkHeight
-	}, fmt.Sprintf("Timed out waiting for block %d.", blkHeight))
-}
-
 func (n *NodeConfig) extractOperatorAddressIfValidator() error {
 	if !n.IsValidator {
 		n.t.Logf("node (%s) is not a validator, skipping", n.Name)

@@ -12,7 +12,8 @@ type ImageConfig struct {
 
 //nolint:deadcode
 const (
-	// name of babylon imge produced by running `make build-docker`
+	// Images that do not have specified tag, latest will be used by default.
+	// name of babylon image produced by running `make build-docker`
 	BabylonContainerName = "babylonchain/babylond"
 	// name of babylon image produced by running `make build-docker-e2e`
 	BabylonContainerNameBeforeUpgrade = "babylonchain/babylond-before-upgrade"

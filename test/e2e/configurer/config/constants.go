@@ -15,9 +15,6 @@ const (
 	MaxRetries = 60
 	// PropSubmitBlocks estimated number of blocks it takes to submit for a proposal
 	PropSubmitBlocks float32 = 1
-	// Minimum deposit value for a proposal to enter a voting period.
-	MinDepositValue = 1000000
-
 	// VanillaUpgradeFilePath upgrade vanilla testing
 	VanillaUpgradeFilePath = "/upgrades/vanilla.json"
 )

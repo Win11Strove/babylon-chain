@@ -202,7 +202,7 @@ build-docs: diagrams
 .PHONY: build-docs
 
 ###############################################################################
-###                           Tests & Simulation                            ###
+###                               E2E build                                 ###
 ###############################################################################
 
 # Executed to build the binary for chain initialization, one of

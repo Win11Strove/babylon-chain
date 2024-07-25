@@ -218,7 +218,7 @@ func initGenesis(chain *internalChain, votingPeriod, expeditedVotingPeriod time.
 		return err
 	}
 
-	err = updateModuleGenesis(appGenState, govtypes.ModuleName, &govv1.GenesisState{}, updateGovGenesis)
+	err = updateModuleGenesis(appGenState, govtypes.ModuleName, &govv1.GenesisState{}, updateGovGenesis(votingPeriod, expeditedVotingPeriod))
 	if err != nil {
 		return err
 	}
@@ -295,11 +295,12 @@ func updateBankGenesis(bankGenState *banktypes.GenesisState) {
 	})
 }
 
-func updateGovGenesis(govGenState *govv1.GenesisState) {
-	govGenState.Params.MinDeposit = sdk.NewCoins(sdk.NewCoin(BabylonDenom, sdkmath.NewInt(100)))
-
-	votingPeriod := time.Duration(time.Second * 10)
-	govGenState.Params.VotingPeriod = &votingPeriod
+func updateGovGenesis(votingPeriod, expeditedVotingPeriod time.Duration) func(govGenState *govv1.GenesisState) {
+	return func(govGenState *govv1.GenesisState) {
+		govGenState.Params.MinDeposit = sdk.NewCoins(sdk.NewCoin(BabylonDenom, sdkmath.NewInt(100)))
+		govGenState.Params.VotingPeriod = &votingPeriod
+		govGenState.Params.ExpeditedVotingPeriod = &expeditedVotingPeriod
+	}
 }
 
 func updateMintGenesis(mintGenState *minttypes.GenesisState) {

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	sdkmath "cosmossdk.io/math"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	cmtabcitypes "github.com/cometbft/cometbft/abci/types"
 	cmttypes "github.com/cometbft/cometbft/types"
@@ -424,6 +425,18 @@ func (n *NodeConfig) QueryProposals() govtypesv1.QueryProposalsResponse {
 	require.NoError(n.t, err)
 
 	var resp govtypesv1.QueryProposalsResponse
+	err = util.Cdc.UnmarshalJSON(bz, &resp)
+	require.NoError(n.t, err)
+
+	return resp
+}
+
+func (n *NodeConfig) QueryAppliedPlan(planName string) upgradetypes.QueryAppliedPlanResponse {
+	path := fmt.Sprintf("cosmos/upgrade/v1beta1/applied_plan/%s", planName)
+	bz, err := n.QueryGRPCGateway(path, url.Values{})
+	require.NoError(n.t, err)
+
+	var resp upgradetypes.QueryAppliedPlanResponse
 	err = util.Cdc.UnmarshalJSON(bz, &resp)
 	require.NoError(n.t, err)
 

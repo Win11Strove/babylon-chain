@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/babylonchain/babylon/test/e2e/configurer/chain"
-	"github.com/babylonchain/babylon/test/e2e/configurer/config"
 	"github.com/babylonchain/babylon/test/e2e/containers"
 	"github.com/babylonchain/babylon/test/e2e/initialization"
 	zctypes "github.com/babylonchain/babylon/x/zoneconcierge/types"
@@ -198,7 +197,7 @@ func NewBTCStakingConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, 
 }
 
 // NewSoftwareUpgradeConfigurer returns a new Configurer for Software Upgrade testing
-func NewSoftwareUpgradeConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
+func NewSoftwareUpgradeConfigurer(t *testing.T, isDebugLogEnabled bool, upgradePath string) (Configurer, error) {
 	containerManager, err := containers.NewManager(isDebugLogEnabled, false, true)
 	if err != nil {
 		return nil, err
@@ -211,7 +210,7 @@ func NewSoftwareUpgradeConfigurer(t *testing.T, isDebugLogEnabled bool) (Configu
 		},
 		withUpgrade(baseSetup), // base set up with upgrade
 		containerManager,
-		config.VanillaUpgradeFilePath,
+		upgradePath,
 		0,
 	), nil
 }

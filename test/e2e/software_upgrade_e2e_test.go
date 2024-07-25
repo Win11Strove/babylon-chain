@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/babylonchain/babylon/test/e2e/configurer"
+	"github.com/babylonchain/babylon/test/e2e/configurer/config"
 )
 
 type SoftwareUpgradeVanillaTestSuite struct {
@@ -16,7 +17,7 @@ func (s *SoftwareUpgradeVanillaTestSuite) SetupSuite() {
 	s.T().Log("setting up e2e integration test suite...")
 	var err error
 
-	s.configurer, err = configurer.NewSoftwareUpgradeConfigurer(s.T(), false)
+	s.configurer, err = configurer.NewSoftwareUpgradeConfigurer(s.T(), false, config.VanillaUpgradeFilePath)
 	s.NoError(err)
 	err = s.configurer.ConfigureChains()
 	s.NoError(err)

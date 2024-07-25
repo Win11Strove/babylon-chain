@@ -16,7 +16,7 @@ func (s *SoftwareUpgradeVanillaTestSuite) SetupSuite() {
 	s.T().Log("setting up e2e integration test suite...")
 	var err error
 
-	s.configurer, err = configurer.NewSoftwareUpgradeTest(s.T(), false)
+	s.configurer, err = configurer.NewSoftwareUpgradeConfigurer(s.T(), false)
 	s.NoError(err)
 	err = s.configurer.ConfigureChains()
 	s.NoError(err)

@@ -197,8 +197,8 @@ func NewBTCStakingConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, 
 	), nil
 }
 
-// NewSoftwareUpgradeTest returns a new Configurer for Software Upgrade testing
-func NewSoftwareUpgradeTest(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
+// NewSoftwareUpgradeConfigurer returns a new Configurer for Software Upgrade testing
+func NewSoftwareUpgradeConfigurer(t *testing.T, isDebugLogEnabled bool) (Configurer, error) {
 	containerManager, err := containers.NewManager(isDebugLogEnabled, false, true)
 	if err != nil {
 		return nil, err

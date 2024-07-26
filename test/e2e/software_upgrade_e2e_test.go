@@ -41,7 +41,7 @@ func (s *SoftwareUpgradeVanillaTestSuite) TestUpgradeVanilla() {
 
 	// makes sure that the upgrade was acutally executed
 	resp := n.QueryAppliedPlan("vanilla")
-	s.Equal(25, resp.Height, "the plan should be applied at the height 25")
+	s.EqualValues(int64(25), resp.Height, "the plan should be applied at the height 25")
 
 	fps := n.QueryFinalityProviders()
 	s.Len(fps, 1, "it should have one finality provider, since the vanilla upgrade just added a new one")

@@ -1,5 +1,6 @@
 RELAYER_TAG := $(shell grep '^ENV RELAYER_TAG' cosmos-relayer/Dockerfile | cut -f3 -d\ )
 BABYLON_FULL_PATH := $(shell git rev-parse --show-toplevel)
+BABYLON_VERSION_BEFORE_UPGRADE ?= a33a3344bb44bde2f3374d3cbf919abb942c341a
 
 all: babylond cosmos-relayer
 
@@ -9,7 +10,7 @@ babylond: babylond-rmi
 babylond-before-upgrade:
 	docker rmi babylonchain/babylond-before-upgrade 2>/dev/null; true && \
 	docker build --tag babylonchain/babylond-before-upgrade -f babylond/Dockerfile \
-    --build-arg VERSION="a33a3344bb44bde2f3374d3cbf919abb942c341a" ${BABYLON_FULL_PATH}
+    --build-arg VERSION="${BABYLON_VERSION_BEFORE_UPGRADE}" ${BABYLON_FULL_PATH}
 
 babylond-rmi:
 	docker rmi babylonchain/babylond 2>/dev/null; true

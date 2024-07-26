@@ -1,9 +1,5 @@
 FROM golang:1.21 AS build-env
 
-# Customize to your build env
-
-# TARGETPLATFORM should be one of linux/amd64 or linux/arm64.
-ARG TARGETPLATFORM="linux/amd64"
 # Version to build. Default is empty
 ARG VERSION
 

@@ -242,7 +242,7 @@ insufficient valid BLS signatures) and the proposer should panic.
 
 The checkpoint is encoded as a special transaction and injected as the first
 transaction of the proposed block. The format of the injected checkpoint is
-defined in [x/proto/babylon/checkpointing/checkpoint.proto](../../proto/babylon/checkpointing/checkpoint.proto).
+defined in [x/proto/babylon/checkpointing/v1/checkpoint.proto](../../proto/babylon/checkpointing/v1/checkpoint.proto).
 Note that the extended commit info that contains previous vote extensions is
 also part of the injected checkpoint, which is used for re-constructing the
 checkpoint in `ProcessProposal`.
@@ -282,7 +282,7 @@ validator votes for the last block of an epoch. It is invoked at the final
 voting phase of a consensus round. It signs the block ID of the proposal and
 constructs a vote extension which will be attached to the pre-commit vote as
 opaque bytes. The format of the vote extension is defined in
-[x/proto/babylon/checkpointing/bls_key.proto](../../proto/babylon/checkpointing/bls_key.proto).
+[x/proto/babylon/checkpointing/v1/bls_key.proto](../../proto/babylon/checkpointing/v1/bls_key.proto).
 
 ```protobuf
 // VoteExtension defines the structure used to create a BLS vote extension.

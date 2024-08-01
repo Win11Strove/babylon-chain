@@ -120,13 +120,16 @@ func (k Keeper) RecordSealerBlockHashForEpoch(ctx context.Context) *types.Epoch 
 // IncEpoch adds epoch number by 1
 // CONTRACT: can only be invoked at the first block of an epoch
 func (k Keeper) IncEpoch(ctx context.Context) types.Epoch {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	epochNumber := k.GetEpoch(ctx).EpochNumber
-	incrementedEpochNumber := epochNumber + 1
 
-	epochInterval := k.GetParams(ctx).EpochInterval
-	newEpoch := types.NewEpoch(incrementedEpochNumber, epochInterval, uint64(sdkCtx.HeaderInfo().Height), nil)
-	k.setEpochInfo(ctx, incrementedEpochNumber, &newEpoch)
+	params := k.GetParams(ctx)
+	epoch := k.GetEpoch(ctx)
+
+	newEpochNumber := epoch.EpochNumber + 1
+	epochInterval := params.EpochInterval
+	firstHeight := epoch.GetLastBlockHeight() + 1
+
+	newEpoch := types.NewEpoch(newEpochNumber, epochInterval, firstHeight, nil)
+	k.setEpochInfo(ctx, newEpochNumber, &newEpoch)
 
 	return newEpoch
 }

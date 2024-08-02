@@ -3,6 +3,7 @@ package types
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"fmt"
 
 	"github.com/btcsuite/btcd/btcec/v2"
@@ -255,7 +256,7 @@ func findFPIdxInWitness(fpSK *btcec.PrivateKey, fpBTCPKs []bbn.BIP340PubKey) (in
 			return i, nil
 		}
 	}
-	return 0, fmt.Errorf("the given finality provider's PK is not found in the BTC delegation")
+	return 0, errors.New("the given finality provider's PK is not found in the BTC delegation")
 }
 
 // BuildSlashingTxWithWitness builds the witness for the slashing tx, including

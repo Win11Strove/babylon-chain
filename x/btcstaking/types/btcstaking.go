@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 
@@ -27,13 +28,13 @@ func (fp *FinalityProvider) ValidateBasic() error {
 		return fmt.Errorf("invalid finality provider address: %s - %w", fp.Addr, err)
 	}
 	if fp.BtcPk == nil {
-		return fmt.Errorf("empty BTC public key")
+		return errors.New("empty BTC public key")
 	}
 	if _, err := fp.BtcPk.ToBTCPK(); err != nil {
 		return fmt.Errorf("BtcPk is not correctly formatted: %w", err)
 	}
 	if fp.Pop == nil {
-		return fmt.Errorf("empty proof of possession")
+		return errors.New("empty proof of possession")
 	}
 	if err := fp.Pop.ValidateBasic(); err != nil {
 		return fmt.Errorf("PoP is not valid: %w", err)
@@ -86,7 +87,7 @@ func GetOrderedCovenantSignatures(fpIdx int, covSigsList []*CovenantAdaptorSigna
 	for _, covSigs := range covSigsList {
 		// find the adaptor signature at the corresponding finality provider's index
 		if fpIdx >= len(covSigs.AdaptorSigs) {
-			return nil, fmt.Errorf("finality provider index is out of the scope")
+			return nil, errors.New("finality provider index is out of the scope")
 		}
 		covSigBytes := covSigs.AdaptorSigs[fpIdx]
 		// decode the adaptor signature bytes

@@ -1,7 +1,7 @@
 package btcstaking
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/btcsuite/btcd/btcec/v2/schnorr"
 	"github.com/btcsuite/btcd/wire"
@@ -12,7 +12,7 @@ func (si *SpendInfo) CreateTimeLockPathWitness(delegatorSig *schnorr.Signature) 
 		panic("cannot build witness without spend info")
 	}
 	if delegatorSig == nil {
-		return nil, fmt.Errorf("delegator signature should not be nil")
+		return nil, errors.New("delegator signature should not be nil")
 	}
 	return CreateWitness(si, [][]byte{delegatorSig.Serialize()})
 }
@@ -34,7 +34,7 @@ func (si *SpendInfo) CreateUnbondingPathWitness(
 	// add covenant signatures to witness stack
 	// NOTE: only a quorum number of covenant signatures needs to be non-nil
 	if len(covenantSigs) == 0 {
-		return nil, fmt.Errorf("covenant signatures should not be empty")
+		return nil, errors.New("covenant signatures should not be empty")
 	}
 	for _, covSig := range covenantSigs {
 		if covSig == nil {
@@ -46,7 +46,7 @@ func (si *SpendInfo) CreateUnbondingPathWitness(
 
 	// add delegator signature to witness stack
 	if delegatorSig == nil {
-		return nil, fmt.Errorf("delegator signature should not be nil")
+		return nil, errors.New("delegator signature should not be nil")
 	}
 	witnessStack = append(witnessStack, delegatorSig.Serialize())
 
@@ -72,7 +72,7 @@ func (si *SpendInfo) CreateSlashingPathWitness(
 	// add covenant signatures to witness stack
 	// NOTE: only a quorum number of covenant signatures needs to be non-nil
 	if len(covenantSigs) == 0 {
-		return nil, fmt.Errorf("covenant signatures should not be empty")
+		return nil, errors.New("covenant signatures should not be empty")
 	}
 	for _, covSig := range covenantSigs {
 		if covSig == nil {
@@ -85,7 +85,7 @@ func (si *SpendInfo) CreateSlashingPathWitness(
 	// add finality provider signatures to witness stack
 	// NOTE: only 1 of the finality provider signatures needs to be non-nil
 	if len(fpSigs) == 0 {
-		return nil, fmt.Errorf("finality provider signatures should not be empty")
+		return nil, errors.New("finality provider signatures should not be empty")
 	}
 	for _, fpSig := range fpSigs {
 		if fpSig == nil {
@@ -97,7 +97,7 @@ func (si *SpendInfo) CreateSlashingPathWitness(
 
 	// add delegator signature to witness stack
 	if delegatorSig == nil {
-		return nil, fmt.Errorf("delegator signature should not be nil")
+		return nil, errors.New("delegator signature should not be nil")
 	}
 	witnessStack = append(witnessStack, delegatorSig.Serialize())
 

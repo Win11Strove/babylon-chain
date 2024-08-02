@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"math"
 
@@ -16,7 +17,7 @@ func parseLockTime(str string) (uint16, error) {
 	}
 
 	if !num.IsUint64() {
-		return 0, fmt.Errorf("staking time is not valid uint")
+		return 0, errors.New("staking time is not valid uint")
 	}
 
 	asUint64 := num.Uint64()
@@ -36,11 +37,11 @@ func parseBtcAmount(str string) (btcutil.Amount, error) {
 	}
 
 	if num.IsNegative() {
-		return 0, fmt.Errorf("staking value is negative")
+		return 0, errors.New("staking value is negative")
 	}
 
 	if !num.IsInt64() {
-		return 0, fmt.Errorf("staking value is not valid uint")
+		return 0, errors.New("staking value is not valid uint")
 	}
 
 	asInt64 := num.Int64()

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"fmt"
 	math "math"
 
@@ -22,25 +23,25 @@ var (
 
 func (m *MsgCreateFinalityProvider) ValidateBasic() error {
 	if m.Commission == nil {
-		return fmt.Errorf("empty commission")
+		return errors.New("empty commission")
 	}
 	if m.Description == nil {
-		return fmt.Errorf("empty description")
+		return errors.New("empty description")
 	}
 	if len(m.Description.Moniker) == 0 {
-		return fmt.Errorf("empty moniker")
+		return errors.New("empty moniker")
 	}
 	if _, err := m.Description.EnsureLength(); err != nil {
 		return err
 	}
 	if m.BtcPk == nil {
-		return fmt.Errorf("empty BTC public key")
+		return errors.New("empty BTC public key")
 	}
 	if _, err := m.BtcPk.ToBTCPK(); err != nil {
 		return fmt.Errorf("invalid BTC public key: %v", err)
 	}
 	if m.Pop == nil {
-		return fmt.Errorf("empty proof of possession")
+		return errors.New("empty proof of possession")
 	}
 	if _, err := sdk.AccAddressFromBech32(m.Addr); err != nil {
 		return fmt.Errorf("invalid FP addr: %s - %v", m.Addr, err)
@@ -50,19 +51,19 @@ func (m *MsgCreateFinalityProvider) ValidateBasic() error {
 
 func (m *MsgEditFinalityProvider) ValidateBasic() error {
 	if m.Commission == nil {
-		return fmt.Errorf("empty commission")
+		return errors.New("empty commission")
 	}
 	if m.Description == nil {
-		return fmt.Errorf("empty description")
+		return errors.New("empty description")
 	}
 	if len(m.Description.Moniker) == 0 {
-		return fmt.Errorf("empty moniker")
+		return errors.New("empty moniker")
 	}
 	if _, err := m.Description.EnsureLength(); err != nil {
 		return err
 	}
 	if len(m.BtcPk) != bbn.BIP340PubKeyLen {
-		return fmt.Errorf("malformed BTC PK")
+		return errors.New("malformed BTC PK")
 	}
 	if _, err := bbn.NewBIP340PubKey(m.BtcPk); err != nil {
 		return err
@@ -76,19 +77,19 @@ func (m *MsgCreateBTCDelegation) ValidateBasic() error {
 		return fmt.Errorf("invalid staker addr %s: %w", m.StakerAddr, err)
 	}
 	if m.Pop == nil {
-		return fmt.Errorf("empty proof of possession")
+		return errors.New("empty proof of possession")
 	}
 	if m.BtcPk == nil {
-		return fmt.Errorf("empty delegator BTC public key")
+		return errors.New("empty delegator BTC public key")
 	}
 	if _, err := m.BtcPk.ToBTCPK(); err != nil {
 		return fmt.Errorf("invalid BTC public key: %v", err)
 	}
 	if m.StakingTx == nil {
-		return fmt.Errorf("empty staking tx info")
+		return errors.New("empty staking tx info")
 	}
 	if m.SlashingTx == nil {
-		return fmt.Errorf("empty slashing tx")
+		return errors.New("empty slashing tx")
 	}
 
 	if _, err := m.SlashingTx.ToMsgTx(); err != nil {
@@ -96,7 +97,7 @@ func (m *MsgCreateBTCDelegation) ValidateBasic() error {
 	}
 
 	if m.DelegatorSlashingSig == nil {
-		return fmt.Errorf("empty delegator signature")
+		return errors.New("empty delegator signature")
 	}
 
 	if _, err := m.DelegatorSlashingSig.ToBTCSig(); err != nil {
@@ -126,13 +127,13 @@ func (m *MsgCreateBTCDelegation) ValidateBasic() error {
 
 	// verifications about on-demand unbonding
 	if m.UnbondingTx == nil {
-		return fmt.Errorf("empty unbonding tx")
+		return errors.New("empty unbonding tx")
 	}
 	if m.UnbondingSlashingTx == nil {
-		return fmt.Errorf("empty slashing tx")
+		return errors.New("empty slashing tx")
 	}
 	if m.DelegatorUnbondingSlashingSig == nil {
-		return fmt.Errorf("empty delegator signature")
+		return errors.New("empty delegator signature")
 	}
 
 	if _, err := m.UnbondingSlashingTx.ToMsgTx(); err != nil {
@@ -161,13 +162,13 @@ func (m *MsgCreateBTCDelegation) ValidateBasic() error {
 
 func (m *MsgAddCovenantSigs) ValidateBasic() error {
 	if m.Pk == nil {
-		return fmt.Errorf("empty BTC covenant public key")
+		return errors.New("empty BTC covenant public key")
 	}
 	if _, err := m.Pk.ToBTCPK(); err != nil {
 		return fmt.Errorf("invalid BTC public key: %v", err)
 	}
 	if m.SlashingTxSigs == nil {
-		return fmt.Errorf("empty covenant signatures on slashing tx")
+		return errors.New("empty covenant signatures on slashing tx")
 	}
 	if len(m.StakingTxHash) != chainhash.MaxHashStringSize {
 		return fmt.Errorf("staking tx hash is not %d", chainhash.MaxHashStringSize)
@@ -175,7 +176,7 @@ func (m *MsgAddCovenantSigs) ValidateBasic() error {
 
 	// verifications about on-demand unbonding
 	if m.UnbondingTxSig == nil {
-		return fmt.Errorf("empty covenant signature")
+		return errors.New("empty covenant signature")
 	}
 
 	if _, err := m.UnbondingTxSig.ToBTCSig(); err != nil {
@@ -183,7 +184,7 @@ func (m *MsgAddCovenantSigs) ValidateBasic() error {
 	}
 
 	if m.SlashingUnbondingTxSigs == nil {
-		return fmt.Errorf("empty covenant signature")
+		return errors.New("empty covenant signature")
 	}
 
 	return nil
@@ -195,7 +196,7 @@ func (m *MsgBTCUndelegate) ValidateBasic() error {
 	}
 
 	if m.UnbondingTxSig == nil {
-		return fmt.Errorf("empty signature from the delegator")
+		return errors.New("empty signature from the delegator")
 	}
 
 	if _, err := m.UnbondingTxSig.ToBTCSig(); err != nil {

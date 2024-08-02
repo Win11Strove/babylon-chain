@@ -2,6 +2,7 @@ package btcstaking
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
@@ -25,9 +26,9 @@ const (
 
 var (
 	unspendableKeyPathKey    = unspendableKeyPathInternalPubKeyInternal(unspendableKeyPath)
-	errBuildingStakingInfo   = fmt.Errorf("error building staking info")
-	errBuildingUnbondingInfo = fmt.Errorf("error building unbonding info")
-	ErrDuplicatedKeyInScript = fmt.Errorf("duplicated key in script")
+	errBuildingStakingInfo   = errors.New("error building staking info")
+	errBuildingUnbondingInfo = errors.New("error building unbonding info")
+	ErrDuplicatedKeyInScript = errors.New("duplicated key in script")
 )
 
 func unspendableKeyPathInternalPubKeyInternal(keyHex string) btcec.PublicKey {
@@ -116,7 +117,7 @@ func newTaprootScriptHolder(
 	scripts [][]byte,
 ) (*taprootScriptHolder, error) {
 	if internalPubKey == nil {
-		return nil, fmt.Errorf("internal public key is nil")
+		return nil, errors.New("internal public key is nil")
 	}
 
 	if len(scripts) == 0 {
@@ -131,14 +132,14 @@ func newTaprootScriptHolder(
 	for i, s := range scripts {
 		script := s
 		if len(script) == 0 {
-			return nil, fmt.Errorf("cannot build tree with empty script")
+			return nil, errors.New("cannot build tree with empty script")
 		}
 
 		tapLeaf := txscript.NewBaseTapLeaf(script)
 		leafHash := tapLeaf.TapHash()
 
 		if _, ok := createdLeafs[leafHash]; ok {
-			return nil, fmt.Errorf("duplicate script in provided scripts")
+			return nil, errors.New("duplicate script in provided scripts")
 		}
 
 		createdLeafs[leafHash] = true
@@ -159,7 +160,7 @@ func (t *taprootScriptHolder) scriptSpendInfoByName(
 	scriptIdx, ok := t.scriptTree.LeafProofIndex[leafHash]
 
 	if !ok {
-		return nil, fmt.Errorf("script not found in script tree")
+		return nil, errors.New("script not found in script tree")
 	}
 
 	merkleProof := t.scriptTree.LeafMerkleProofs[scriptIdx]
@@ -229,7 +230,7 @@ func SpendInfoFromRevealedScript(
 	scriptIdx, ok := tree.LeafProofIndex[leafHash]
 
 	if !ok {
-		return nil, fmt.Errorf("script not found in script tree")
+		return nil, errors.New("script not found in script tree")
 	}
 
 	merkleProof := tree.LeafMerkleProofs[scriptIdx]
@@ -314,7 +315,7 @@ func newBabylonScriptPaths(
 	lockTime uint16,
 ) (*babylonScriptPaths, error) {
 	if stakerKey == nil {
-		return nil, fmt.Errorf("staker key is nil")
+		return nil, errors.New("staker key is nil")
 	}
 
 	if err := checkForDuplicateKeys(stakerKey, fpKeys, covenantKeys); err != nil {

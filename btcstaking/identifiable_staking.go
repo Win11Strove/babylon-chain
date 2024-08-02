@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 
 	"github.com/btcsuite/btcd/btcec/v2"
@@ -135,7 +136,7 @@ func NewV0OpReturnDataFromBytes(b []byte) (*V0OpReturnData, error) {
 
 func getV0OpReturnBytes(out *wire.TxOut) ([]byte, error) {
 	if out == nil {
-		return nil, fmt.Errorf("nil tx output")
+		return nil, errors.New("nil tx output")
 	}
 
 	// We are adding `+2` as each op return has additional 2 for:
@@ -146,7 +147,7 @@ func getV0OpReturnBytes(out *wire.TxOut) ([]byte, error) {
 	}
 
 	if !txscript.IsNullData(out.PkScript) {
-		return nil, fmt.Errorf("invalid op return script")
+		return nil, errors.New("invalid op return script")
 	}
 
 	return out.PkScript[2:], nil
@@ -300,7 +301,7 @@ func tryToGetOpReturnDataFromOutputs(outputs []*wire.TxOut) (*V0OpReturnData, in
 		// include multiple op return outputs in a single transaction. In such case, we should
 		// return an error.
 		if opReturnData != nil {
-			return nil, -1, fmt.Errorf("multiple op return outputs found")
+			return nil, -1, errors.New("multiple op return outputs found")
 		}
 
 		opReturnData = d
@@ -329,7 +330,7 @@ func tryToGetStakingOutput(outputs []*wire.TxOut, stakingOutputPkScript []byte) 
 
 		if stakingOutput != nil {
 			// we only allow for one staking output per transaction
-			return nil, -1, fmt.Errorf("multiple staking outputs found")
+			return nil, -1, errors.New("multiple staking outputs found")
 		}
 
 		stakingOutput = output
@@ -351,7 +352,7 @@ func ParseV0StakingTx(
 ) (*ParsedV0StakingTx, error) {
 	// 1. Basic arguments checks
 	if tx == nil {
-		return nil, fmt.Errorf("nil tx")
+		return nil, errors.New("nil tx")
 	}
 
 	if len(expectedTag) != TagLen {
@@ -359,16 +360,16 @@ func ParseV0StakingTx(
 	}
 
 	if len(covenantKeys) == 0 {
-		return nil, fmt.Errorf("no covenant keys specified")
+		return nil, errors.New("no covenant keys specified")
 	}
 
 	if covenantQuorum > uint32(len(covenantKeys)) {
-		return nil, fmt.Errorf("covenant quorum is greater than the number of covenant keys")
+		return nil, errors.New("covenant quorum is greater than the number of covenant keys")
 	}
 
 	// 2. Identify whether the transaction has expected shape
 	if len(tx.TxOut) < 2 {
-		return nil, fmt.Errorf("staking tx must have at least 2 outputs")
+		return nil, errors.New("staking tx must have at least 2 outputs")
 	}
 
 	opReturnData, opReturnOutputIdx, err := tryToGetOpReturnDataFromOutputs(tx.TxOut)
@@ -378,7 +379,7 @@ func ParseV0StakingTx(
 	}
 
 	if opReturnData == nil {
-		return nil, fmt.Errorf("transaction does not have expected op return output")
+		return nil, errors.New("transaction does not have expected op return output")
 	}
 
 	// at this point we know that transaction has op return output which seems to match
@@ -418,7 +419,7 @@ func ParseV0StakingTx(
 	}
 
 	if stakingOutput == nil {
-		return nil, fmt.Errorf("staking output not found in potential staking transaction")
+		return nil, errors.New("staking output not found in potential staking transaction")
 	}
 
 	return &ParsedV0StakingTx{

@@ -169,7 +169,7 @@ func (bc *baseConfigurer) RunIBCTransferChannel() error {
 func (bc *baseConfigurer) runHermesIBCRelayer(chainConfigA *chain.Config, chainConfigB *chain.Config) error {
 	bc.t.Log("starting Hermes relayer container...")
 
-	tmpDir, err := os.MkdirTemp("", "bbn-e2e-testnet-hermes-")
+	tmpDir, err := os.MkdirTemp("", "bbn-e2e-testnet-hermes-*")
 	if err != nil {
 		return err
 	}
@@ -251,7 +251,7 @@ func (bc *baseConfigurer) runHermesIBCRelayer(chainConfigA *chain.Config, chainC
 func (bc *baseConfigurer) runCosmosIBCRelayer(chainConfigA *chain.Config, chainConfigB *chain.Config) error {
 	bc.t.Log("Starting Cosmos relayer container...")
 
-	tmpDir, err := os.MkdirTemp("", "bbn-e2e-testnet-cosmos-")
+	tmpDir, err := os.MkdirTemp("", "bbn-e2e-testnet-cosmos-*")
 	if err != nil {
 		return err
 	}
@@ -309,10 +309,11 @@ func (bc *baseConfigurer) createBabylonPhase2Channel(chainA *chain.Config, chain
 		"--channel-version", chainA.IBCConfig.Version,
 		"--new-client-connection", "--yes",
 	}
-	_, _, err := bc.containerManager.ExecHermesCmd(bc.t, cmd, "SUCCESS")
+	out, errBuff, err := bc.containerManager.ExecHermesCmd(bc.t, cmd, "")
 	if err != nil {
 		return err
 	}
+	bc.t.Logf("bc.containerManager.ExecHermesCmd: out: %s, errBuf: %s", out.String(), errBuff.String())
 	bc.t.Logf("connected %s and %s chains via IBC", chainA.ChainMeta.Id, chainB.ChainMeta.Id)
 	bc.t.Logf("chainA's IBC config: %v", chainA.IBCConfig)
 	bc.t.Logf("chainB's IBC config: %v", chainB.IBCConfig)

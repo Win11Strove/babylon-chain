@@ -107,11 +107,13 @@ func (s *BTCTimestampingPhase2HermesTestSuite) Test1IbcCheckpointingPhase2Hermes
 	// BTC timestamps in Babylon contract
 	chainA.WaitUntilHeight(int64(endEpochNum*10 + 5))
 	babylonNode.FinalizeSealedEpochs(1, endEpochNum)
+	// wait another block to take effect
+	babylonNode.WaitForNextBlock()
 
 	// ensure endEpochNum has been finalised
 	endEpoch, err := babylonNode.QueryRawCheckpoint(endEpochNum)
 	s.NoError(err)
-	s.Equal(endEpoch.Status, ct.Finalized)
+	s.Equal(endEpoch.Status.String(), ct.Finalized.String())
 
 	// there should be 3 IBC packets sent (with sequence number 1, 2, 3).
 	// Thus, the next sequence number will eventually be 4

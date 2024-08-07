@@ -36,25 +36,27 @@ type Manager struct {
 	network           *dockertest.Network
 	resources         map[string]*dockertest.Resource
 	isDebugLogEnabled bool
+	identifier        string
 }
 
 // NewManager creates a new Manager instance and initializes
 // all Docker specific utilities. Returns an error if initialization fails.
-func NewManager(isDebugLogEnabled bool, isCosmosRelayer, isUpgrade bool) (docker *Manager, err error) {
-	docker = &Manager{
+func NewManager(identifier string, isDebugLogEnabled bool, isCosmosRelayer, isUpgrade bool) (m *Manager, err error) {
+	m = &Manager{
 		ImageConfig:       NewImageConfig(isCosmosRelayer, isUpgrade),
 		resources:         make(map[string]*dockertest.Resource),
 		isDebugLogEnabled: isDebugLogEnabled,
+		identifier:        identifier,
 	}
-	docker.pool, err = dockertest.NewPool("")
+	m.pool, err = dockertest.NewPool("")
 	if err != nil {
 		return nil, err
 	}
-	docker.network, err = docker.pool.CreateNetwork("bbn-testnet")
+	m.network, err = m.pool.CreateNetwork(m.NetworkName())
 	if err != nil {
 		return nil, err
 	}
-	return docker, nil
+	return m, nil
 }
 
 // ExecTxCmd Runs ExecTxCmdWithSuccessString searching for `code: 0`
@@ -73,7 +75,7 @@ func (m *Manager) ExecTxCmdWithSuccessString(t *testing.T, chainId string, conta
 
 // ExecHermesCmd executes command on the hermes relaer container.
 func (m *Manager) ExecHermesCmd(t *testing.T, command []string, success string) (bytes.Buffer, bytes.Buffer, error) {
-	return m.ExecCmd(t, hermesContainerName, command, success)
+	return m.ExecCmd(t, m.HermesContainerName(), command, success)
 }
 
 // ExecCmd executes command by running it on the node container (specified by containerName)
@@ -162,7 +164,7 @@ func (m *Manager) ExecCmd(t *testing.T, containerName string, command []string, 
 func (m *Manager) RunHermesResource(chainAID, osmoARelayerNodeName, osmoAValMnemonic, chainBID, osmoBRelayerNodeName, osmoBValMnemonic string, hermesCfgPath string) (*dockertest.Resource, error) {
 	hermesResource, err := m.pool.RunWithOptions(
 		&dockertest.RunOptions{
-			Name:       hermesContainerName,
+			Name:       m.HermesContainerName(),
 			Repository: m.RelayerRepository,
 			Tag:        m.RelayerTag,
 			NetworkID:  m.network.Network.ID,
@@ -198,7 +200,7 @@ func (m *Manager) RunHermesResource(chainAID, osmoARelayerNodeName, osmoAValMnem
 	if err != nil {
 		return nil, err
 	}
-	m.resources[hermesContainerName] = hermesResource
+	m.resources[m.HermesContainerName()] = hermesResource
 	return hermesResource, nil
 }
 
@@ -207,7 +209,7 @@ func (m *Manager) RunHermesResource(chainAID, osmoARelayerNodeName, osmoAValMnem
 func (m *Manager) RunRlyResource(chainAID, osmoARelayerNodeName, osmoAValMnemonic, chainAIbcPort, chainBID, osmoBRelayerNodeName, osmoBValMnemonic, chainBIbcPort string, rlyCfgPath string) (*dockertest.Resource, error) {
 	rlyResource, err := m.pool.RunWithOptions(
 		&dockertest.RunOptions{
-			Name:       cosmosRelayerContainerName,
+			Name:       m.RelayerContainerName(),
 			Repository: m.RelayerRepository,
 			Tag:        m.RelayerTag,
 			NetworkID:  m.network.Network.ID,
@@ -239,7 +241,7 @@ func (m *Manager) RunRlyResource(chainAID, osmoARelayerNodeName, osmoAValMnemoni
 	if err != nil {
 		return nil, err
 	}
-	m.resources[cosmosRelayerContainerName] = rlyResource
+	m.resources[m.RelayerContainerName()] = rlyResource
 	return rlyResource, nil
 }
 
@@ -255,12 +257,14 @@ func (m *Manager) RunNodeResource(chainId string, containerName, valCondifDir st
 		Name:       containerName,
 		Repository: m.CurrentRepository,
 		NetworkID:  m.network.Network.ID,
+		Networks:   []*dockertest.Network{m.network},
 		User:       "root:root",
 		Entrypoint: []string{
 			"sh",
 			"-c",
 			"babylond start " + FlagHome,
 		},
+		// TODO: verify if exposed ports need to be dinamic, since e2e might run in parallel
 		ExposedPorts: []string{"26656", "26657", "1317", "9090"},
 		Mounts: []string{
 			fmt.Sprintf("%s/:%s", valCondifDir, BabylonHomePath),
@@ -344,6 +348,21 @@ func noRestart(config *docker.HostConfig) {
 	config.RestartPolicy = docker.RestartPolicy{
 		Name: "no",
 	}
+}
+
+// RelayerContainerName returns the relayer container name with identifier of the manager.
+func (m *Manager) RelayerContainerName() string {
+	return fmt.Sprintf("%s-%s", cosmosRelayerContainerName, m.identifier)
+}
+
+// HermesContainerName returns the hermes relayer container name with identifier of the manager.
+func (m *Manager) HermesContainerName() string {
+	return fmt.Sprintf("%s-%s", hermesContainerName, m.identifier)
+}
+
+// NetworkName returns the network name with identifier of the manager.
+func (m *Manager) NetworkName() string {
+	return fmt.Sprintf("bbn-testnet-%s", m.identifier)
 }
 
 // RunChainInitResource runs a chain init container to initialize genesis and configs for a chain with chainId.

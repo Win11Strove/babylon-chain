@@ -68,6 +68,18 @@ func (n *NodeConfig) Run() error {
 			// This fails if unsuccessful.
 			_, err := n.QueryCurrentHeight()
 			if err != nil {
+				st, errRpc := n.rpcClient.Status(context.Background())
+				n.t.Logf("failed to query current height, status %+v: %s", st)
+				n.t.Logf("Logpath: %s", resource.Container.LogPath)
+				if errRpc != nil {
+					n.t.Logf("errRpc: %s", errRpc.Error())
+				}
+
+				stnode, errNode := n.Status()
+				n.t.Logf("failed to query current height, status node %+v: %s", stnode, err.Error())
+				if errNode != nil {
+					n.t.Logf("errNode: %s", errNode.Error())
+				}
 				return false
 			}
 			n.t.Logf("started node container: %s", n.Name)

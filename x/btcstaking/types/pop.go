@@ -46,7 +46,7 @@ func NewPoPBTC(addr sdk.AccAddress, btcSK *btcec.PrivateKey) (*ProofOfPossession
 	return &pop, nil
 }
 
-// NewPoPWithECDSABTCSig generates a new proof of possession where Bitcoin signature is in ECDSA format
+// NewPoPBTCWithECDSABTCSig generates a new proof of possession where Bitcoin signature is in ECDSA format
 // a proof of possession contains two signatures:
 // - pop.BtcSig = ecdsa_sign(sk_BTC, addr)
 func NewPoPBTCWithECDSABTCSig(addr sdk.AccAddress, btcSK *btcec.PrivateKey) (*ProofOfPossessionBTC, error) {

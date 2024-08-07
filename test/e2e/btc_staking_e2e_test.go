@@ -71,7 +71,7 @@ func (s *BTCStakingTestSuite) TearDownSuite() {
 	s.Require().NoError(err)
 }
 
-// TestCreateFinalityProviderAndDelegation is an end-to-end test for
+// Test1CreateFinalityProviderAndDelegation is an end-to-end test for
 // user story 1: user creates finality provider and BTC delegation
 func (s *BTCStakingTestSuite) Test1CreateFinalityProviderAndDelegation() {
 	chainA := s.configurer.GetChainConfig(0)
@@ -258,7 +258,7 @@ func (s *BTCStakingTestSuite) Test2SubmitCovenantSignature() {
 	s.Equal(activeFps[0].VotingPower, activeDel.VotingPower(currentBtcTip.Height, initialization.BabylonBtcFinalizationPeriod, params.CovenantQuorum))
 }
 
-// Test2CommitPublicRandomnessAndSubmitFinalitySignature is an end-to-end
+// Test3CommitPublicRandomnessAndSubmitFinalitySignature is an end-to-end
 // test for user story 3: finality provider commits public randomness and submits
 // finality signature, such that blocks can be finalised.
 func (s *BTCStakingTestSuite) Test3CommitPublicRandomnessAndSubmitFinalitySignature() {

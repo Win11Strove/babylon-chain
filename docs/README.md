@@ -10,3 +10,4 @@ For user-facing docs, visit the [Babylon documentation page](https://docs.babylo
 - [Running a node for testing purposes](./run-node.md)
 - [Babylon system architecture](./architecture.md)
 - [Staking BTC script](./staking-script.md)
+- [Observable Staking Transactions Specification](./transaction-impl-spec.md)

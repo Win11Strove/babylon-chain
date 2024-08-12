@@ -3,7 +3,7 @@
 The BTC light client module is essentially a BTC light client that maintains
 the canonical header chain of Bitcoin.
 
-Babylon chain needs to know about different events happening on Bitcoin chain.
+Babylon chain needs to know about different events happening on the Bitcoin chain.
 To make it possible in a secure way, Babylon needs to know the current
 state of the Bitcoin chain i.e., what is the canonical chain of the Bitcoin network.
 
@@ -28,19 +28,19 @@ state of the Bitcoin chain i.e., what is the canonical chain of the Bitcoin netw
 
 ### Problem statement
 
-The Babylon chain needs to learn and validate a number of events that had
+The Babylon chain needs to learn and validate a number of events that have
 happened on the Bitcoin chain. Those events are:
 
 1. `New checkpoint event` - Bitcoin Timestamping protocol requires checkpoints
 on Bitcoin to be reported back to Babylon. To do it securely, each checkpoint
 must be reported back along with the inclusion proof of transactions
-which carry this checkpoint.
+that carry this checkpoint.
 2. `New BTC delegation event` - Bitcoin Staking protocol requires staking
 transactions to be deep enough in the Bitcoin chain. Thus, the staking
 transactions also must be accompanied by the inclusion proof.
 
 To properly validate those inclusion proofs, the Babylon chain needs to know the
-current state of BTC chain i.e., what is current canonical chain recognized by BTC.
+current state of the BTC chain i.e., what is the current canonical chain recognized by BTC.
 
 ### Babylon's BTC light client design
 
@@ -65,7 +65,7 @@ valid [MsgInsertHeaders](#msginsertheaders) messages.
 
 If a better fork is encountered:
 1. The current chain is rolled back to the parent of the received fork.
-2. The chain is extend with new headers from the fork.
+2. The chain is extended with new headers from the fork.
 
 A better fork is defined as the fork with higher total difficulty, summing the
 difficulties for each block in the fork.
@@ -139,7 +139,7 @@ does not point to the current BTC chain tip.
 ### MsgInsertHeaders
 
 `MsgInsertHeaders` is the main message processed by the BTC light client module.
-Its purpose is to update the state of the BTC chain as viewed by Babylon chain.
+Its purpose is to update the state of the BTC chain as viewed by the Babylon chain.
 
 The handler of this message is defined
 at [x/btclightclient/keeper/msg_server.go](./keeper/msg_server.go).
@@ -167,9 +167,9 @@ the header at position `i + 1`, must have its `PrevBlock` field set to header's 
 - The first header of the list must point to a header already maintained by the BTC
 light client module.
 - Each header must be correctly encoded.
-- Each header in the list must have valid proof of work and difficulty.
+- Each header in the list must have a valid proof of work and difficulty.
 - Each header in the list must have a `Timestamp` that is greater than the median
-of last 11 ancestors.
+of the last 11 ancestors.
 - If the first header of the list does not point to the current tip of the
 chain maintained by the BTC light client, it means that the message contains a fork. For
 the fork to be valid, the forked chain must be better than the current chain maintained by

@@ -2,7 +2,7 @@
 
 Babylon's BTC Staking protocol introduces an additional consensus round on
 blocks produced by CometBFT, called the finality round. The participants of this
-round are referred as finality providers and their voting power stems from
+round are referred to as finality providers and their voting power stems from
 staked bitcoins delegated to them.
 
 The Finality module is responsible for handling finality votes, maintaining the
@@ -12,7 +12,7 @@ in the finalization rounds. This includes:
 - handling requests for submitting finality votes from finality providers;
 - maintaining the finalization status of blocks;
 - identifying sluggish finality providers; and
-- maintaining equivocation evidences of culpable finality providers.
+- maintaining equivocation evidence of culpable finality providers.
 
 ## Table of contents
 
@@ -80,7 +80,7 @@ needs to interact with Babylon as follows:
 - **Committing EOTS master public randomness.** The finality provider needs to
   generate a pair of EOTS master secret/public randomness, and commit the master
   public randomness when registering itself to Babylon. The EOTS master
-  secret/public randomness allows to derive a EOTS secret/public randomness
+  secret/public randomness allows to derive an EOTS secret/public randomness
   deterministically for each given height, respectively. Babylon further
   requires the epoch of the finality provider registration to be finalized by
   BTC timestamping before the registered finality provider can submit finality
@@ -98,7 +98,7 @@ needs to interact with Babylon as follows:
 
 Babylon has implemented a [BTC staking
 tracker](https://github.com/babylonchain/vigilante) daemon program that
-subscribes to equivocation evidences in the Finality module, and slashes BTC
+subscribes to equivocation evidence in the Finality module, and slashes BTC
 delegations under equivocating finality providers by sending their slashing
 transactions to the Bitcoin network.
 
@@ -143,7 +143,7 @@ message IndexedBlock {
 }
 ```
 
-### Equivocation evidences
+### Equivocation evidence
 
 The [equivocation evidence storage](./keeper/evidence.go) maintains evidences of
 equivocation offences committed by finality providers. The key is a finality
@@ -226,7 +226,7 @@ message FinalityProviderSigningInfo {
 Note that the value of `missed_blocks_counter` in the
 `FinalityProviderSigningInfo` is the same as the summed value of the
 corresponding missed block bitmap. This is to avoid unnecessary bitmap reads.
-Also note that the judgement of whether a finality signature is `missed` or not
+Also, note that the judgement of whether a finality signature is `missed` or not
 is irreversible.
 
 The two maps will be updated upon `BeginBlock` which will be described in a
@@ -274,7 +274,7 @@ Upon `MsgAddFinalitySig`, a Babylon node will execute as follows:
 2. Ensure the epoch that the finality provider is registered has been finalized
    by BTC timestamping.
 3. Ensure the finality provider has voting power at this height.
-4. Ensure the finality provider has not previously casted the same vote.
+4. Ensure the finality provider has not previously cast the same vote.
 5. Derive the EOTS public randomness using the committed EOTS master public
    randomness and the block height.
 6. Verify the EOTS signature w.r.t. the derived EOTS public randomness.
@@ -284,7 +284,7 @@ Upon `MsgAddFinalitySig`, a Babylon node will execute as follows:
    storage. If the finality provider has also voted for the block at the same
    height, then this finality provider is slashed, i.e., its voting power is
    removed, equivocation evidence is recorded, and a slashing event is emitted.
-8. If the voted block's `AppHash` is same as that of the canonical block at the
+8. If the voted block's `AppHash` is the same as that of the canonical block at the
    same height, then this means the finality provider has voted for the
    canonical block, and the Babylon node will store this finality vote to the
    finality vote storage. If the finality provider has also voted for a fork
@@ -323,7 +323,7 @@ been >=1 active BTC delegations)*:
    `IndexedBlock` object, and save it to the indexed block storage.
 2. Tally all non-finalized blocks as follows:
    1. Find the starting height that the Babylon node should start to finalize.
-      This is the earliest height that is not finalize yet since the activation
+      This is the earliest height that is not finalized yet since the activation
       of BTC staking.
    2. For each `IndexedBlock` between the starting height and the current
       height, tally this block as follows:
@@ -338,8 +338,8 @@ been >=1 active BTC delegations)*:
          distribute rewards to the voted finality providers and their BTC
          delegations. Otherwise, none of the subsequent blocks shall be
          finalized and the loop breaks here.
-3. Update the finality provider's voting history and label it to `sluggish`
-   if the number of block it has missed has passed the parameterized threshold.
+3. Update the finality provider's voting history and label it `sluggish`
+   if the number of blocks it has missed has passed the parameterized threshold.
 
 ## Events
 

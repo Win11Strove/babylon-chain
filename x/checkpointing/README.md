@@ -33,9 +33,9 @@ scheme, around which this module provides the following functionalities:
 
 Babylon checkpoints record the state of the Babylon chain at
 the end of a particular [epoch](../../x/epoching/README.md).
-They are created with the intention to be included in
+They are created with the intention of being included in
 the Bitcoin ledger to protect Babylon and
-the chains that connect with it against long range attacks.
+the chains that connect with it against long-range attacks.
 The confirmation of a Babylon checkpoint on Bitcoin
 serves as an immutable record of Babylon's state
 up to the checkpointed epoch and
@@ -175,7 +175,7 @@ message GenesisKey {
 
 ## Messages
 
-The Checkpointing module handles requests of registering Babylon validators.
+The Checkpointing module handles requests for registering Babylon validators.
 The request message type is defined at
 [proto/babylon/checkpointing/v1/tx.proto](../../proto/babylon/checkpointing/v1/tx.proto).
 The message handler is defined at

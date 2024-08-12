@@ -2,12 +2,12 @@
 
 ## Workflows
 
-The following are the most prominent workflows. The diagrams depict cross-module communication, which hopefully helps us build a common picture of the high level interactions of the system.
+The following are the most prominent workflows. The diagrams depict cross-module communication, which hopefully helps us build a common picture of the high-level interactions of the system.
 
 ### Validator Registration and Staking
 
 In order to support regular checkpointing, Babylon has two extensions over the regular Tendermint consensus:
-* the use of epochs, during which the validator set in stable
+* the use of epochs, during which the validator is set in stable
 * the use of BLS keys for signature aggregation
 
 In order to keep changes to the Cosmos SDK to a minimum and maximize code reuse, the `epoching` module _wraps_ the `staking` module: the regular staking transactions are still used, but enveloped in a Babylon transaction that allows us to attach extra data as well as to control when these transactions are executed.
@@ -22,14 +22,14 @@ The next diagram depicts the process of the power transfer that takes place at t
 
 ### Submit Checkpoint
 
-Once the raw checkpoint is available, vigilantes take it and send them to Bitcoin,
+Once the raw checkpoint is available, vigilantes take it and send it to Bitcoin,
 paying the BTC fees, for future rewards on Babylon.
 
 ![Submit Checkpoint](diagrams/submit_checkpoint.png)
 
 ### BTC Light Client
 
-To be able to confirm checkpoints we need to know how deeply embedded they are into the Bitcoin mainchain. This requires an on-chain light client, which relayers feed each bitcoin header they observe.
+To be able to confirm checkpoints we need to know how deeply embedded they are into the Bitcoin mainchain. This requires an on-chain light client, which relayers feed each Bitcoin header they observe.
 
 ![BTC Light Client](diagrams/btc_light_client.png)
 
@@ -37,7 +37,7 @@ To be able to confirm checkpoints we need to know how deeply embedded they are i
 
 Even though we use a Key-Value store instead of a Relational Database, the following Entity Relationship Diagram is useful to get a sense of the conceptual data model, including the cardinalities. The grouping shows which module the collections belong to in the design.
 
-Note that some boxes are actually _messages_ and aren't part of the storage schema, they are just there to illustrate where some of the entities are coming from, or to establish a relationship between entities that come to life as a result of a common message, but then live separately without explicit foreign keys between them.
+Note that some boxes are actually _messages_ and aren't part of the storage schema, they are just there to illustrate where some of the entities are coming from or to establish a relationship between entities that come to life as a result of a common message, but then live separately without explicit foreign keys between them.
 
 ![Database Schema](diagrams/database_schema.png)
 

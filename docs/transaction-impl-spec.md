@@ -72,7 +72,7 @@ the value in this output is known as `staking_amount`
 - have `OP_RETURN` output which contains: `global_parameters.tag`,
  `version`, `staker_pk`,`finality_provider_pk`, `staking_time`
 - all the values must be valid for the `global_parameters` which are applicable at
-the height in which the staking transaction is included in the BTC ledger.
+the height at which the staking transaction is included in the BTC ledger.
 
 
 #### OP_RETURN output description
@@ -117,8 +117,8 @@ StakingDataPkScript = 0x6a || 0x47 || SerializedStakingData
 ```
 
 where:
-- 0x6a - is byte marker representing OP_RETURN op code
-- 0x47 - is byte marker representing OP_DATA_71 op code, which pushed 71 bytes onto the stack
+- 0x6a - is the byte marker representing the OP_RETURN op code
+- 0x47 - is the byte marker representing the OP_DATA_71 op code, which pushed 71 bytes onto the stack
 
 The final OP_RETURN output will have the following shape:
 ```
@@ -151,11 +151,11 @@ be used as locking time in the `timelock_script`. It must be a valid `uint16` nu
 in the range `global_parameters.min_staking_time <= staking_time <= global_parameters.max_staking_time`.
 It needs to be put in the OP_RETURN output of the staking transaction.
 - `covenant_committee_public_keys` - it can be retrieved from
-`global_parameters.covenant_pks`. It is set of covenant committee public keys which
+`global_parameters.covenant_pks`. It is a set of covenant committee public keys which
 will be put in `unbonding_script` and `slashing_script`.
 - `covenant_committee_quorum` - it can be retrieved from
-`global_parameters.covenant_quorum`. It is quorum of covenant committee
-member required to authorize spending using `unbonding_script` or `slashing_script`
+`global_parameters.covenant_quorum`. It is a quorum of covenant committee
+members required to authorize spending using `unbonding_script` or `slashing_script`
 - `staking_amout` - chosen by the user, it will be placed in `staking_output.value`
 - `btc_network` - btc network on which staking transactions will take place
 
@@ -204,7 +204,7 @@ For the transaction to be considered a valid unbonding transaction, it must:
 - have exactly one input and one output
 - input must be valid a staking output
 - output must be a taproot output. This taproot output must have disabled
-the key spending path, and committed to script tree composed of two scripts:
+the key spending path, and committed to a script tree composed of two scripts:
 the timelock script and the slashing script. This output is henceforth known
 as the `unbonding_output`
 - timelock in the time lock script must be equal to `global_parameters.unbonding_time`
@@ -240,12 +240,12 @@ in `staking_transaction`
 
 ## Spending taproot outputs
 
-To create transactions which spend from taproot outputs, either staking output
+To create transactions that spend from taproot outputs, either staking output
 or unbonding output, providing signatures satisfying the script is not enough.
 
 The spender must also provide:
 - the whole script which is being spent
-- the control block which contains: leaf version, internal public key, and proof of
+- the control block which contains: the leaf version, internal public key, and proof of
 inclusion of the given script in the script tree
 
 Given that creating scripts is deterministic for given data, it is possible to
@@ -311,9 +311,9 @@ or to put them in a PSBT which can be used by bitcoind to create the witness.
 
 ### Creating PSBT to get signature for given taproot path from Bitcoind
 
-To avoid creating signatures/witness manually,
+To avoid creating signatures/witnesses manually,
 Bitcoind's [walletprocesspsbt](https://developer.bitcoin.org/reference/rpc/walletprocesspsbt.html)
-can be used. To use this Bitcoind endpoint to get signature/witness the wallet must
+can be used. To use this Bitcoind endpoint to get the signature/witness the wallet must
 maintain one of the keys used in the script.
 
 Example of creating psbt to sign unbonding transaction using unbonding script from
@@ -364,7 +364,7 @@ func BuildPsbtForSigningUnbondingTransaciton(
 
 ```
 
-Given that to spend through the unbonding script requires more than the
+Given that spending through the unbonding script requires more than the
 staker's signature, the `walletprocesspsbt` endpoint will produce a new psbt
 with the staker signature attached.
 

@@ -155,7 +155,7 @@ messages to the Staking module. Consequently, the Staking module receives and
 handles staking-related messages, and performs validator set updates.
 
 **Bitcoin-assisted Unbonding.** Babylon implements the Bitcoin-assisted
-unbonding mechanism by invoking the Staking module upon a checkpointed epoch .
+unbonding mechanism by invoking the Staking module upon a checkpointed epoch.
 Specifically, the Staking module's `BlockValidatorUpdates`
 [function](https://github.com/cosmos/cosmos-sdk/blob/7e6948f50cd4838a0161838a099f74e0b5b0213c/x/staking/keeper/val_state_change.go#L36-L102)
 is responsible for identifying and unbonding mature validators and delegations

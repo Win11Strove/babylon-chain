@@ -1,7 +1,7 @@
 # Babylon Upgrades
 
 This folder contains sub-folders for every babylon upgrade. (Both state
-migrations, and hard forks) It also defines upgrade & hard fork structs,
+migrations and hard forks) It also defines upgrade & hard fork structs,
 that each upgrade implements. These then get included in the application
 app.go to run the upgrade.
 
@@ -27,7 +27,7 @@ type Upgrade struct {
  UpgradeName string
  // Function that creates an upgrade handler
  CreateUpgradeHandler func(mm *module.Manager, configurator module.Configurator, keepers *keepers.AppKeepers) upgradetypes.UpgradeHandler
- // Store upgrades, should be used for any new modules introduced, new modules deleted, or store names renamed.
+ // Store upgrades should be used for any new modules introduced, new modules deleted, or store names renamed.
  StoreUpgrades store.StoreUpgrades
 }
 

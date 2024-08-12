@@ -38,7 +38,7 @@ module based on their depth according to the BTC Light Client module.
 ### [Checkpointing](../x/checkpointing)
 
 The checkpointing module is responsible for creating Babylon checkpoints
-to be submitted to Bitcoin and maintaining their confirmation status.
+to be submitted to Bitcoin and for maintaining their confirmation status.
 It collects the validator's
 [BLS signatures](https://en.wikipedia.org/wiki/BLS_digital_signature)
 for each block to be checkpointed and aggregates them
@@ -140,7 +140,7 @@ A standalone program that monitors:
   on the Bitcoin ledger to inform Babylon about them.
 - The execution of BTC Staking slashing transactions in the case
   of a finality provider double voting.
-  In the case of non-execution the monitor extracts the finality provider's
+  In the case of non-execution, the monitor extracts the finality provider's
   private key and executes the slashing.
 - The execution of a selective slashing attack launched
   by a finality provider. In this case,
@@ -205,7 +205,7 @@ inside the Babylon ledger to enable checkpointing and
 propagating checkpoint information to the Babylon smart contract
 deployed within the CZ.
 
-There are different IBC relayer implementations that can achieve
+Different IBC relayer implementations can achieve
 this function. Most notably:
 
 - [Cosmos Relayer](https://github.com/cosmos/relayer):
